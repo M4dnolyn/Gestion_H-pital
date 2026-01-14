@@ -1,0 +1,199 @@
+{% extends 'includes/header.html' %} {% block title %}Rendez-vous{% endblock %}
+{% block extra_css %}
+<!-- FullCalendar CSS -->
+<link
+  href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
+  rel="stylesheet"
+/>
+{% endblock %} {% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1><i class="fas fa-calendar-alt text-success"></i> Rendez-vous</h1>
+  <div class="btn-group">
+    <a href="{% url 'rendezvous_create' %}" class="btn btn-success">
+      <i class="fas fa-calendar-plus"></i> Nouveau RDV
+    </a>
+    <button
+      type="button"
+      class="btn btn-outline-success dropdown-toggle"
+      data-bs-toggle="dropdown"
+    >
+      <i class="fas fa-calendar"></i> Vues
+    </button>
+    <ul class="dropdown-menu">
+      <li>
+        <a class="dropdown-item" href="{% url 'rendezvous_list' %}?view=list"
+          ><i class="fas fa-list"></i> Liste</a
+        >
+      </li>
+      <li>
+        <a
+          class="dropdown-item"
+          href="{% url 'rendezvous_list' %}?view=calendar"
+          ><i class="fas fa-calendar"></i> Calendrier</a
+        >
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- Vue Liste -->
+{% if request.GET.view != 'calendar' %}
+<div class="card">
+  <div
+    class="card-header bg-light d-flex justify-content-between align-items-center"
+  >
+    <h5 class="mb-0"><i class="fas fa-list"></i> Liste des Rendez-vous</h5>
+    <div class="btn-group">
+      <a href="?status=today" class="btn btn-outline-primary btn-sm"
+        >Aujourd'hui</a
+      >
+      <a href="?status=upcoming" class="btn btn-outline-success btn-sm"
+        >À venir</a
+      >
+      <a href="?status=past" class="btn btn-outline-secondary btn-sm">Passés</a>
+      <a href="?" class="btn btn-outline-info btn-sm">Tous</a>
+    </div>
+  </div>
+  <div class="card-body">
+    {% if rendezvous_list %}
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Date & Heure</th>
+            <th>Patient</th>
+            <th>Médecin</th>
+            <th>Type</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rdv in rendezvous_list %}
+          <tr>
+            <td>
+              <strong>{{ rdv.date|date:"d/m/Y" }}</strong><br />
+              <small class="text-muted"
+                >{{ rdv.heure_debut|time:"H:i" }} - {{ rdv.heure_fin|time:"H:i"
+                }}</small
+              >
+            </td>
+            <td>
+              <a
+                href="{% url 'patient_detail' rdv.patient.id %}"
+                class="text-decoration-none"
+              >
+                {{ rdv.patient.nom }} {{ rdv.patient.prenom }}
+              </a>
+            </td>
+            <td>{{ rdv.medecin|default:"Non assigné" }}</td>
+            <td>
+              <span class="badge bg-info"
+                >{{ rdv.type|default:"Consultation" }}</span
+              >
+            </td>
+            <td>
+              {% if rdv.statut == 'confirmé' %}
+              <span class="badge bg-success">Confirmé</span>
+              {% elif rdv.statut == 'annulé' %}
+              <span class="badge bg-danger">Annulé</span>
+              {% elif rdv.statut == 'reporté' %}
+              <span class="badge bg-warning">Reporté</span>
+              {% else %}
+              <span class="badge bg-secondary">En attente</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="btn-group btn-group-sm">
+                <a
+                  href="{% url 'rendezvous_detail' rdv.id %}"
+                  class="btn btn-outline-info"
+                  title="Détails"
+                >
+                  <i class="fas fa-eye"></i>
+                </a>
+                <a
+                  href="{% url 'rendezvous_update' rdv.id %}"
+                  class="btn btn-outline-warning"
+                  title="Modifier"
+                >
+                  <i class="fas fa-edit"></i>
+                </a>
+                {% if rdv.statut != 'annulé' %}
+                <a
+                  href="{% url 'rendezvous_cancel' rdv.id %}"
+                  class="btn btn-outline-danger"
+                  title="Annuler"
+                >
+                  <i class="fas fa-times"></i>
+                </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+      <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+      <h4 class="text-muted">Aucun rendez-vous programmé</h4>
+      <p class="text-muted">Planifiez votre premier rendez-vous.</p>
+      <a href="{% url 'rendezvous_create' %}" class="btn btn-success">
+        <i class="fas fa-calendar-plus"></i> Nouveau rendez-vous
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% else %}
+<!-- Vue Calendrier -->
+<div class="card">
+  <div class="card-header bg-light">
+    <h5 class="mb-0">
+      <i class="fas fa-calendar"></i> Calendrier des Rendez-vous
+    </h5>
+  </div>
+  <div class="card-body">
+    <div id="calendar"></div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Bouton pour revenir au tableau de bord -->
+<div class="mt-3">
+  <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left"></i> Retour au tableau de bord
+  </a>
+</div>
+{% endblock %} {% block extra_js %} {% if request.GET.view == 'calendar' %}
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/fr.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var calendarEl = document.getElementById("calendar");
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: "dayGridMonth",
+      locale: "fr",
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay",
+      },
+      events: "/api/rendezvous/calendar/", // À adapter à ton API
+      eventClick: function (info) {
+        // Rediriger vers le détail du RDV
+        window.location.href = "/rendezvous/" + info.event.id + "/";
+      },
+      eventColor: "#198754", // Couleur verte
+      eventTextColor: "#fff",
+    });
+
+    calendar.render();
+  });
+</script>
+{% endif %} {% endblock %}

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Espace Médecin</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { background: #2c3e50; color: white; padding: 20px; border-radius: 5px; }
+        .content { background: #f9f9f9; padding: 20px; margin-top: 20px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👨‍⚕️ Espace Médecin</h1>
+            <p>Bonjour Dr. {{ user.username }}</p>
+        </div>
+        <div class="content">
+            <h2>Fonctionnalités Médecin :</h2>
+            <ul>
+                <li>📅 Gestion des rendez-vous</li>
+                <li>🩺 Consultations patients</li>
+                <li>💊 Prescriptions médicales</li>
+                <li>📋 Dossiers patients</li>
+            </ul>
+            <a href="{% url 'dashboard' %}">← Retour au tableau de bord principal</a>
+        </div>
+    </div>
+</body>
+</html>

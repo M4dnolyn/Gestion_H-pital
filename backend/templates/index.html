@@ -1,0 +1,30 @@
+{% extends 'includes/header.html' %} 
+{% block title %}Accueil - Clinique{%endblock %} 
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-8 text-center">
+    <h1 class="display-4 mb-4">
+      <i class="fas fa-heartbeat text-primary"></i><br />
+      Bienvenue à la Clinique Médicale
+    </h1>
+    <p class="lead mb-4">
+      Prenez soin de votre santé avec notre équipe de professionnels dévoués.
+    </p>
+
+    <div class="mt-5">
+      {% if user.is_authenticated %}
+      <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg">
+        <i class="fas fa-tachometer-alt"></i> Accéder au Tableau de Bord
+      </a>
+      {% else %}
+      <a href="{% url 'login' %}" class="btn btn-primary btn-lg me-3">
+        <i class="fas fa-sign-in-alt"></i> Connexion Personnel
+      </a>
+      <a href="#" class="btn btn-outline-primary btn-lg">
+        <i class="fas fa-info-circle"></i> En savoir plus
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

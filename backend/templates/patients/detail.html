@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Détail Patient - {{ patient.nom }}{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'patient_list' %}">Patients</a></li>
+    <li class="breadcrumb-item active">{{ patient.nom }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-user me-2 text-primary"></i> {{ patient.nom }} {{ patient.prenom }}
+        </h1>
+        <a href="{% url 'patient_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Retour
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Informations Personnelles</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Nom :</strong> {{ patient.nom }}</p>
+                    <p><strong>Prénom :</strong> {{ patient.prenom }}</p>
+                    <p><strong>Téléphone :</strong> {{ patient.telephone|default:"Non renseigné" }}</p>
+                    <p><strong>Email :</strong> {{ patient.email|default:"Non renseigné" }}</p>
+                    <p><strong>Date de création :</strong> {{ patient.date_creation|date:"d/m/Y H:i" }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'rendezvous_create' %}" class="btn btn-success">
+                            <i class="fas fa-calendar-plus me-1"></i> Nouveau Rendez-vous
+                        </a>
+                        <a href="{% url 'consultation_create' %}" class="btn btn-warning">
+                            <i class="fas fa-file-medical me-1"></i> Nouvelle Consultation
+                        </a>
+                        <a href="{% url 'patient_update' patient.id %}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-1"></i> Modifier
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

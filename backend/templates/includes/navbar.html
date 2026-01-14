@@ -1,0 +1,67 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'index' %}">
+      <i class="fas fa-hospital"></i> Clinique
+    </a>
+
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'dashboard' %}">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'patient_list' %}">
+            <i class="fas fa-users"></i> Patients
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'rendezvous_list' %}">
+            <i class="fas fa-calendar-check"></i> Rendez-vous
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'consultation_list' %}">
+            <i class="fas fa-stethoscope"></i> Consultations
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+
+      <ul class="navbar-nav">
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <span class="navbar-text me-3">
+            <i class="fas fa-user"></i> {{ user.username }}
+          </span>
+        </li>
+        <li class="nav-item">
+             <form method="post" action="{% url 'logout' %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-light btn-sm">
+                      <i class="fas fa-sign-out-alt"></i> Déconnexion
+                  </button>
+             </form>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'login' %}">
+            <i class="fas fa-sign-in-alt"></i> Connexion
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>

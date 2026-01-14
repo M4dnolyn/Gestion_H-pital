@@ -1,0 +1,412 @@
+{% extends 'base.html' %} {% block title %}Tableau de bord - Gestion
+Hospitalière{% endblock %} {% block content %}
+<div class="container-fluid">
+  <!-- En-tête -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">
+      <i class="fas fa-tachometer-alt me-2"></i>Tableau de bord
+    </h1>
+    <div>
+      <span class="badge bg-success">
+        <i class="fas fa-sync-alt me-1"></i> Données en temps réel
+      </span>
+    </div>
+  </div>
+
+  <!-- Indicateurs clés -->
+  <div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card stat-card border-start border-primary border-4">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col">
+              <div class="text-xs fw-bold text-primary text-uppercase mb-1">
+                Total Patients
+              </div>
+              <div class="h5 mb-0 fw-bold text-gray-800">
+                {{ total_patients }}
+              </div>
+              <div class="mt-2">
+                <span class="badge badge-trend-up">
+                  <i class="fas fa-arrow-up me-1"></i> +12% ce mois
+                </span>
+              </div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-users fa-2x text-primary"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card stat-card border-start border-success border-4">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col">
+              <div class="text-xs fw-bold text-success text-uppercase mb-1">
+                Total Personnel
+              </div>
+              <div class="h5 mb-0 fw-bold text-gray-800">
+                {{ total_personnel }}
+              </div>
+              <div class="mt-2">
+                <span class="badge badge-trend-up">
+                  <i class="fas fa-arrow-up me-1"></i> +3 ce mois
+                </span>
+              </div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-user-md fa-2x text-success"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card stat-card border-start border-warning border-4">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col">
+              <div class="text-xs fw-bold text-warning text-uppercase mb-1">
+                Consultations du jour
+              </div>
+              <div class="h5 mb-0 fw-bold text-gray-800">
+                {{ consultations_aujourdhui }}
+              </div>
+              <div class="mt-2">
+                <span class="badge badge-trend-neutral">
+                  <i class="fas fa-minus me-1"></i> {{ rdv_en_attente }} en
+                  attente
+                </span>
+              </div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-stethoscope fa-2x text-warning"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card stat-card border-start border-info border-4">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col">
+              <div class="text-xs fw-bold text-info text-uppercase mb-1">
+                Paiements du jour
+              </div>
+              <div class="h5 mb-0 fw-bold text-gray-800">
+                {{ paiements_du_jour }}
+              </div>
+              <div class="mt-2">
+                <span class="badge badge-trend-up">
+                  <i class="fas fa-arrow-up me-1"></i> +8% vs hier
+                </span>
+              </div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-credit-card fa-2x text-info"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deux colonnes principales -->
+  <div class="row">
+    <!-- Colonne gauche -->
+    <div class="col-lg-8">
+      <!-- Patients récents -->
+      <div class="card mb-4">
+        <div class="card-header bg-white py-3">
+          <h5 class="mb-0">
+            <i class="fas fa-user-clock me-2"></i>Patients récents
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="list-group list-group-flush">
+              {% for patient in patients_recents %}
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                         <h6 class="mb-1">{{ patient.nom }} {{ patient.prenom }}</h6>
+                         <small class="text-muted">{{ patient.date_creation|date:"d/m/Y" }}</small>
+                    </div>
+                    <span class="badge bg-warning">Nouveau</span>
+              </div>
+              {% empty %}  <!-- DOIT ÊTRE DIRECTEMENT APRÈS LA BOUCHE, SANS ESPACE -->
+              <div class="list-group-item text-center text-muted py-3">
+                   Aucun patient récent
+              </div>
+              {% endfor %}
+          </div>
+          <div class="text-end mt-3">
+            <a
+              href="{% url 'patient_list' %}"
+              class="btn btn-sm btn-outline-primary"
+            >
+              <i class="fas fa-list me-1"></i> Voir tous les patients
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rendez-vous à venir -->
+      <div class="card mb-4">
+        <div class="card-header bg-white py-3">
+          <h5 class="mb-0">
+            <i class="fas fa-calendar-alt me-2"></i>Prochains rendez-vous
+          </h5>
+        </div>
+        <div class="card-body">
+          {% for rdv in prochains_rdv %}
+          <div class="d-flex align-items-center border-bottom pb-3 mb-3">
+            <div class="flex-shrink-0">
+              <div class="bg-primary text-white rounded-circle p-3">
+                <i class="fas fa-clock fa-lg"></i>
+              </div>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h5 class="mb-1">
+                {{ rdv.patient.nom }} {{ rdv.patient.prenom }}
+              </h5>
+              <p class="mb-0 text-muted">
+                {% if rdv.medecin %} Dr. {{ rdv.medecin.user.last_name }} • {%
+                endif %} {{ rdv.heure_debut|time:"H:i" }} • {{ rdv.type }}
+              </p>
+            </div>
+            <a
+              href="{% url 'rendezvous_detail' rdv.id %}"
+              class="btn btn-sm btn-outline-primary"
+            >
+              <i class="fas fa-eye me-1"></i> Voir
+            </a>
+          </div>
+          {% empty %}
+          <div class="text-center text-muted py-3">
+            Aucun rendez-vous à venir
+          </div>
+          {% endfor %}
+
+          <div class="text-center">
+            <a href="{% url 'rendezvous_create' %}" class="btn btn-primary">
+              <i class="fas fa-calendar-plus me-2"></i> Nouveau rendez-vous
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Colonne droite -->
+    <div class="col-lg-4">
+      <!-- Accès rapide -->
+      <div class="card mb-4">
+        <div class="card-header bg-white py-3">
+          <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Accès rapide</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-2">
+            <div class="col-6">
+              <a
+                href="{% url 'rendezvous_list' %}"
+                class="btn btn-outline-primary w-100 mb-2"
+              >
+                <i class="fas fa-calendar-alt me-1"></i> Rendez-vous
+              </a>
+            </div>
+            <div class="col-6">
+              <a
+                href="{% url 'consultation_list' %}"
+                class="btn btn-outline-success w-100 mb-2"
+              >
+                <i class="fas fa-stethoscope me-1"></i> Consultations
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="#" class="btn btn-outline-info w-100 mb-2">
+                <i class="fas fa-file-prescription me-1"></i> Ordonnances
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="#" class="btn btn-outline-warning w-100 mb-2">
+                <i class="fas fa-file-invoice-dollar me-1"></i> Facturation
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="#" class="btn btn-outline-secondary w-100 mb-2">
+                <i class="fas fa-procedures me-1"></i> Services
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="#" class="btn btn-outline-danger w-100 mb-2">
+                <i class="fas fa-umbrella-beach me-1"></i> Congés
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gestion des congés -->
+      <div class="card">
+        <div class="card-header bg-white py-3">
+          <h5 class="mb-0">
+            <i class="fas fa-umbrella-beach me-2"></i>Gestion des Congés
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row text-center mb-3">
+            <div class="col-4">
+              <div class="p-2 bg-warning bg-opacity-10 rounded">
+                <div class="h4 mb-0">1</div>
+                <small class="text-muted">En attente</small>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-2 bg-success bg-opacity-10 rounded">
+                <div class="h4 mb-0">2</div>
+                <small class="text-muted">Approuvés</small>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-2 bg-danger bg-opacity-10 rounded">
+                <div class="h4 mb-0">1</div>
+                <small class="text-muted">Refusés</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-grid">
+            <a href="#" class="btn btn-primary">
+              <i class="fas fa-plus me-1"></i> Nouvelle demande
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Services hospitaliers -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-white py-3">
+          <h5 class="mb-0">
+            <i class="fas fa-hospital me-2"></i>Services hospitaliers
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <div class="card h-100 border">
+                <div class="card-body">
+                  <h6 class="card-title">Cardiologie</h6>
+                  <p class="card-text small text-muted">
+                    Service de cardiologie avec équipement moderne
+                  </p>
+                  <div class="mt-3">
+                    <small>
+                      <i class="fas fa-building me-1"></i> Bâtiment A - 2ᵉ
+                      étage<br />
+                      <i class="fas fa-user-md me-1"></i> Dr. Dupont
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-3 mb-3">
+              <div class="card h-100 border">
+                <div class="card-body">
+                  <h6 class="card-title">Pédiatrie</h6>
+                  <p class="card-text small text-muted">
+                    Service dédié aux soins des enfants
+                  </p>
+                  <div class="mt-3">
+                    <small>
+                      <i class="fas fa-building me-1"></i> Bâtiment B - 1ᵉʳ
+                      étage<br />
+                      <i class="fas fa-user-md me-1"></i> Dr. Laurent
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-3 mb-3">
+              <div class="card h-100 border">
+                <div class="card-body">
+                  <h6 class="card-title">Urgences</h6>
+                  <p class="card-text small text-muted">
+                    Service disponible 24h/24 et 7j/7
+                  </p>
+                  <div class="mt-3">
+                    <small>
+                      <i class="fas fa-clock me-1"></i> 24/7<br />
+                      <i class="fas fa-ambulance me-1"></i> Urgence
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-3 mb-3">
+              <div class="card h-100 border">
+                <div class="card-body">
+                  <h6 class="card-title">Radiologie</h6>
+                  <p class="card-text small text-muted">
+                    Scanner, IRM et radiographie
+                  </p>
+                  <div class="mt-3">
+                    <small>
+                      <i class="fas fa-x-ray me-1"></i> Imagerie<br />
+                      <i class="fas fa-user-md me-1"></i> À désigner
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript pour les graphiques -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Graphique des consultations (exemple)
+    const ctx = document.createElement("canvas");
+    ctx.id = "consultationsChart";
+    document.querySelector(".col-lg-8").appendChild(ctx);
+
+    new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
+        datasets: [
+          {
+            label: "Consultations",
+            data: [35, 42, 38, 45, 40, 30, 25],
+            borderColor: "#3498db",
+            backgroundColor: "rgba(52, 152, 219, 0.1)",
+            tension: 0.4,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "top",
+          },
+        },
+      },
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends 'base.html' %} {% block title %}Connexion - Hôpital{% endblock %} {%
+block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+    <div class="card border-0 shadow">
+      <div class="card-header bg-primary text-white text-center py-4">
+        <h4 class="mb-0">
+          <i class="fas fa-hospital fa-2x mb-3"></i><br />
+          Système de Gestion Hospitalière
+        </h4>
+        <p class="mb-0 opacity-75">Connectez-vous selon votre rôle</p>
+      </div>
+
+      <div class="card-body p-4">
+        <!-- Sélecteur de rôle (visuel seulement) -->
+        <div class="mb-4">
+          <label class="form-label">Je suis :</label>
+          <div class="row g-2">
+            <div class="col-6">
+              <button
+                type="button"
+                class="btn btn-outline-primary w-100 role-btn"
+                data-role="medecin"
+              >
+                <i class="fas fa-user-md"></i> Médecin
+              </button>
+            </div>
+            <div class="col-6">
+              <button
+                type="button"
+                class="btn btn-outline-success w-100 role-btn"
+                data-role="infirmier"
+              >
+                <i class="fas fa-user-nurse"></i> Infirmier
+              </button>
+            </div>
+            <div class="col-6">
+              <button
+                type="button"
+                class="btn btn-outline-info w-100 role-btn"
+                data-role="admin"
+              >
+                <i class="fas fa-user-tie"></i> Administratif
+              </button>
+            </div>
+            <div class="col-6">
+              <button
+                type="button"
+                class="btn btn-outline-warning w-100 role-btn"
+                data-role="caissier"
+              >
+                <i class="fas fa-cash-register"></i> Caissier
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formulaire de connexion -->
+        <form method="post">
+          {% csrf_token %} {% if form.errors %}
+          <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Identifiants incorrects. Veuillez réessayer.
+          </div>
+          {% endif %}
+
+          <div class="mb-3">
+            <label for="id_username" class="form-label"
+              >Nom d'utilisateur</label
+            >
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="fas fa-user"></i>
+              </span>
+              <input
+                type="text"
+                name="username"
+                class="form-control"
+                id="id_username"
+                placeholder="admin"
+                required
+                autofocus
+              />
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="id_password" class="form-label">Mot de passe</label>
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="fas fa-lock"></i>
+              </span>
+              <input
+                type="password"
+                name="password"
+                class="form-control"
+                id="id_password"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="fas fa-sign-in-alt me-2"></i> Se connecter
+            </button>
+          </div>
+
+          <div class="text-center mt-4">
+            <p class="text-muted small mb-2">Identifiants de test :</p>
+            <div class="bg-light p-3 rounded small">
+              <div class="row">
+                <div class="col-6">
+                  <strong>Admin :</strong><br />
+                  admin / admin123
+                </div>
+                <div class="col-6">
+                  <strong>Médecin :</strong><br />
+                  medecin / medecin123
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="text-center mt-4">
+      <p class="text-muted">
+        <small>© 2024 Système Hospitalier • Interface sécurisée</small>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Animation pour les boutons de rôle
+    const roleButtons = document.querySelectorAll(".role-btn");
+    roleButtons.forEach((btn) => {
+      btn.addEventListener("click", function () {
+        roleButtons.forEach((b) => b.classList.remove("active"));
+        this.classList.add("active");
+
+        // Changement visuel selon le rôle
+        const role = this.dataset.role;
+        const usernameField = document.getElementById("id_username");
+
+        if (role === "medecin") {
+          usernameField.placeholder = "dr.dupont";
+        } else if (role === "infirmier") {
+          usernameField.placeholder = "infirmier";
+        } else if (role === "admin") {
+          usernameField.placeholder = "admin";
+        } else if (role === "caissier") {
+          usernameField.placeholder = "caissier";
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

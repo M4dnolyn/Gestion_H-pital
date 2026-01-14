@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Espace Infirmier</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { background: #27ae60; color: white; padding: 20px; border-radius: 5px; }
+        .content { background: #f9f9f9; padding: 20px; margin-top: 20px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👨‍⚕️ Espace Infirmier</h1>
+            <p>Bonjour {{ user.username }}</p>
+        </div>
+        <div class="content">
+            <h2>Fonctionnalités Infirmier :</h2>
+            <ul>
+                <li>💉 Soins aux patients</li>
+                <li>📊 Surveillance des constantes</li>
+                <li>💊 Administration des médicaments</li>
+                <li>📝 Suivi des traitements</li>
+            </ul>
+            <a href="{% url 'dashboard' %}">← Retour au tableau de bord principal</a>
+        </div>
+    </div>
+</body>
+</html>
