@@ -1,10 +1,7 @@
 {% extends 'includes/header.html' %} {% block title %}Rendez-vous{% endblock %}
 {% block extra_css %}
 <!-- FullCalendar CSS -->
-<link
-  href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
-  rel="stylesheet"
-/>
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
 {% endblock %} {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h1><i class="fas fa-calendar-alt text-success"></i> Rendez-vous</h1>
@@ -12,25 +9,16 @@
     <a href="{% url 'rendezvous_create' %}" class="btn btn-success">
       <i class="fas fa-calendar-plus"></i> Nouveau RDV
     </a>
-    <button
-      type="button"
-      class="btn btn-outline-success dropdown-toggle"
-      data-bs-toggle="dropdown"
-    >
+    <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown">
       <i class="fas fa-calendar"></i> Vues
     </button>
     <ul class="dropdown-menu">
       <li>
-        <a class="dropdown-item" href="{% url 'rendezvous_list' %}?view=list"
-          ><i class="fas fa-list"></i> Liste</a
-        >
+        <a class="dropdown-item" href="{% url 'rendezvous_list' %}?view=list"><i class="fas fa-list"></i> Liste</a>
       </li>
       <li>
-        <a
-          class="dropdown-item"
-          href="{% url 'rendezvous_list' %}?view=calendar"
-          ><i class="fas fa-calendar"></i> Calendrier</a
-        >
+        <a class="dropdown-item" href="{% url 'rendezvous_list' %}?view=calendar"><i class="fas fa-calendar"></i>
+          Calendrier</a>
       </li>
     </ul>
   </div>
@@ -39,17 +27,11 @@
 <!-- Vue Liste -->
 {% if request.GET.view != 'calendar' %}
 <div class="card">
-  <div
-    class="card-header bg-light d-flex justify-content-between align-items-center"
-  >
+  <div class="card-header bg-light d-flex justify-content-between align-items-center">
     <h5 class="mb-0"><i class="fas fa-list"></i> Liste des Rendez-vous</h5>
     <div class="btn-group">
-      <a href="?status=today" class="btn btn-outline-primary btn-sm"
-        >Aujourd'hui</a
-      >
-      <a href="?status=upcoming" class="btn btn-outline-success btn-sm"
-        >À venir</a
-      >
+      <a href="?status=today" class="btn btn-outline-primary btn-sm">Aujourd'hui</a>
+      <a href="?status=upcoming" class="btn btn-outline-success btn-sm">À venir</a>
       <a href="?status=past" class="btn btn-outline-secondary btn-sm">Passés</a>
       <a href="?" class="btn btn-outline-info btn-sm">Tous</a>
     </div>
@@ -73,24 +55,16 @@
           <tr>
             <td>
               <strong>{{ rdv.date|date:"d/m/Y" }}</strong><br />
-              <small class="text-muted"
-                >{{ rdv.heure_debut|time:"H:i" }} - {{ rdv.heure_fin|time:"H:i"
-                }}</small
-              >
+              <small class="text-muted">{{ rdv.heure_debut|time:"H:i" }} - {{ rdv.heure_fin|time:"H:i" }}</small>
             </td>
             <td>
-              <a
-                href="{% url 'patient_detail' rdv.patient.id %}"
-                class="text-decoration-none"
-              >
+              <a href="{% url 'patient_detail' rdv.patient.id %}" class="text-decoration-none">
                 {{ rdv.patient.nom }} {{ rdv.patient.prenom }}
               </a>
             </td>
             <td>{{ rdv.medecin|default:"Non assigné" }}</td>
             <td>
-              <span class="badge bg-info"
-                >{{ rdv.type|default:"Consultation" }}</span
-              >
+              <span class="badge bg-info">{{ rdv.type|default:"Consultation" }}</span>
             </td>
             <td>
               {% if rdv.statut == 'confirmé' %}
@@ -105,26 +79,14 @@
             </td>
             <td>
               <div class="btn-group btn-group-sm">
-                <a
-                  href="{% url 'rendezvous_detail' rdv.id %}"
-                  class="btn btn-outline-info"
-                  title="Détails"
-                >
+                <a href="{% url 'rendezvous_detail' rdv.id %}" class="btn btn-outline-info" title="Détails">
                   <i class="fas fa-eye"></i>
                 </a>
-                <a
-                  href="{% url 'rendezvous_update' rdv.id %}"
-                  class="btn btn-outline-warning"
-                  title="Modifier"
-                >
+                <a href="{% url 'rendezvous_update' rdv.id %}" class="btn btn-outline-warning" title="Modifier">
                   <i class="fas fa-edit"></i>
                 </a>
                 {% if rdv.statut != 'annulé' %}
-                <a
-                  href="{% url 'rendezvous_cancel' rdv.id %}"
-                  class="btn btn-outline-danger"
-                  title="Annuler"
-                >
+                <a href="{% url 'rendezvous_cancel' rdv.id %}" class="btn btn-outline-danger" title="Annuler">
                   <i class="fas fa-times"></i>
                 </a>
                 {% endif %}

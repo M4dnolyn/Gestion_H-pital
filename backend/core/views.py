@@ -6,6 +6,13 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from datetime import date
 
+
+# ==================== VUES PUBLIQUES ====================
+
+def index(request):
+    """Page d'accueil publique"""
+    return render(request, 'index.html')
+
 # ------------------------------------------------------------
 # FONCTIONS DE VÉRIFICATION DES RÔLES (CORRIGÉES)
 # ------------------------------------------------------------
@@ -223,13 +230,8 @@ def dashboard(request):
             'upcoming_rdv': [],
         })
     
-    # Déterminer le template à utiliser
+    # Utiliser le même dashboard pour tous les rôles
     template_name = 'dashboard/index.html'
-    if 'role' in context:
-        role = context['role']
-        # Si vous avez des templates spécifiques par rôle
-        if role in ['MED', 'INF', 'ADM', 'CAI']:
-            template_name = f'dashboard/roles/{role.lower()}.html'
     
     return render(request, template_name, context)
 

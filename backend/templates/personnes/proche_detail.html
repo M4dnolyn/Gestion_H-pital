@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ proche.nom_complet }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">{{ proche.nom_complet }}</h3>
+                    <span class="badge bg-light text-dark">Proche Aidant</span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Coordonnées</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-phone text-muted me-2"></i> {{ proche.telephone }}
+                                </li>
+                                <li class="mb-2"><i class="fas fa-calendar-alt text-muted me-2"></i> Né(e) le {{
+                                    proche.date_naissance|date:"d/m/Y" }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Lien de parenté</h5>
+                            <p class="lead">{{ proche.lien_parent }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Patients associés -->
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-injured"></i> Patients Associés</h5>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for patient in patients %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="{% url 'patient_detail' patient.pk %}" class="text-decoration-none text-dark">
+                            <strong>{{ patient.nom_complet }}</strong>
+                        </a>
+                        <span class="badge bg-light text-muted">{{ patient.telephone }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-muted text-center">Aucun patient associé</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-center mt-4">
+                <a href="{% url 'proche_list' %}" class="btn btn-secondary me-md-2">Retour à la liste</a>
+                <a href="{% url 'proche_update' proche.pk %}" class="btn btn-warning me-md-2">
+                    <i class="fas fa-edit"></i> Modifier
+                </a>
+                <a href="{% url 'proche_delete' proche.pk %}" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Supprimer
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Service {{ service.nom_service }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">{{ service.nom_service }}</h2>
+                    <span class="badge bg-light text-dark">{{ nb_personnel }} membres</span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-map-marker-alt"></i> Localisation</h5>
+                            <p class="lead">{{ service.localisation }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-user-tie"></i> Responsable</h5>
+                            {% if service.responsable %}
+                            <p class="lead">
+                                <a href="{% url 'personnel_detail' service.responsable.pk %}"
+                                    class="text-decoration-none">
+                                    {{ service.responsable.nom_complet }}
+                                </a>
+                            </p>
+                            {% else %}
+                            <p class="text-muted font-italic">Aucun responsable assigné</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <h5>Description</h5>
+                    <p>{{ service.description|linebreaks }}</p>
+
+                    <div class="mt-4">
+                        <a href="{% url 'services:service_update' service.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Modifier le Service
+                        </a>
+                        <a href="{% url 'services:service_delete' service.pk %}" class="btn btn-danger ms-2">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-users"></i> Personnel Affecté</h5>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for p in personnel %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <a href="{% url 'personnel_detail' p.pk %}"
+                                class="text-decoration-none text-dark">
+                                <strong>{{ p.nom_complet }}</strong>
+                            </a>
+                            <div class="small text-muted">{{ p.get_fonction_display }}</div>
+                        </div>
+                        <span class="badge bg-light text-dark border">{{ p.statut }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-center text-muted">
+                        Aucun personnel affecté à ce service
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="card-footer">
+                    <a href="{% url 'rh:personnel_service_create' %}?service={{ service.id }}"
+                        class="btn btn-sm btn-outline-success w-100">
+                        <i class="fas fa-user-plus"></i> Affecter du personnel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

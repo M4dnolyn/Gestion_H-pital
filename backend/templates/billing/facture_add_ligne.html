@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ajouter Prestation - Facture #{{ facture.id }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-plus"></i> Ajouter Prestation à la Facture #{{ facture.id }}</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ field.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'billing:facture_detail' facture.pk %}"
+                                class="btn btn-secondary me-md-2">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Ajouter</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Script pour remplir automatiquement le prix unitaire
+    document.addEventListener('DOMContentLoaded', function () {
+        const prestationSelect = document.getElementById('id_prestation');
+        const prixInput = document.getElementById('id_prix_unit');
+
+        // Note: Idéalement, on utiliserait une API pour récupérer le prix
+        // Pour l'instant, le formulaire se recharge s'il est soumis,
+        // mais pour une meilleure UX on pourrait ajouter du JS ici
+    });
+</script>
+{% endblock %}

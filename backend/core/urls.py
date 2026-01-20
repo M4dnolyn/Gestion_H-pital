@@ -1,27 +1,22 @@
-# core/urls.py
 from django.urls import path
-from . import views
+from . import views, web_views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     # Dashboard
-    path('', views.dashboard, name='dashboard'),
+    path('dashboard/', views.dashboard, name='dashboard'),
     
-    # Dashboards par rôle
-    path('medecin/', views.dashboard_medecin, name='dashboard_medecin'),
-    path('infirmier/', views.dashboard_infirmier, name='dashboard_infirmier'),
-    path('administratif/', views.dashboard_admin, name='dashboard_admin'),
+    # Public
+    path('', views.index, name='index'),
     
-    # Gestion des données
-    path('patients/', views.patients_list, name='patients'),
-    path('personnel/', views.personnel_list, name='personnel'),
-    path('rendezvous/', views.appointments, name='rendezvous'),
-    path('consultations/', views.consultations, name='consultations'),
+    # Auth (Redirection vers les vues standard Django mais avec les templates du projet)
+    path('accounts/login/', auth_views.LoginView.as_view(template_name='accounts/login.html'), name='login'),
+    path('accounts/logout/', views.logout_view, name='logout'),
+    path('accounts/logout/confirm/', views.logout_confirm, name='logout_confirm'),
     
-    # Authentification
-    path('logout/', views.logout_view, name='logout'),
-    path('logout/confirm/', views.logout_confirm, name='logout_confirm'),
-    
-    # Test et santé
-    path('test/', views.test_view, name='test'),
-    path('health/', views.health_check, name='health_check'),
+    # API / Test
+    path('api/health/', views.health_check, name='health_check'),
+
+    # Administration
+    path('users/create/', web_views.admin_create_user, name='admin_create_user'),
 ]

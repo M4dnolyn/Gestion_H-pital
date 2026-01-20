@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestion du Personnel{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-user-md"></i> Personnel Médical & Administratif</h1>
+                <a href="{% url 'personnel_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Nouveau Membre
+                </a>
+            </div>
+
+            <!-- Statistiques -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Personnel</h5>
+                            <h2>{{ total_personnel }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Actifs</h5>
+                            <h2>{{ personnel_actif }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Médecins</h5>
+                            <h2>{{ medecins }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Infirmiers</h5>
+                            <h2>{{ infirmiers }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtres -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <input type="text" name="q" class="form-control"
+                                placeholder="Rechercher (nom, email, tél...)" value="{{ request.GET.q }}">
+                        </div>
+                        <div class="col-md-3">
+                            <select name="fonction" class="form-select">
+                                <option value="">Toutes fonctions</option>
+                                {% for code, label in fonctions %}
+                                <option value="{{ code }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="statut" class="form-select">
+                                <option value="">Tous statuts</option>
+                                {% for code, label in statuts %}
+                                <option value="{{ code }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-filter"></i> Filtrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Nom Complet</th>
+                                    <th>Fonction</th>
+                                    <th>Contact</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in personnel %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle bg-light text-primary me-2">
+                                                {{ p.nom|first }}{{ p.prenom|first }}
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">{{ p.nom_complet }}</div>
+                                                <small class="text-muted">{{ p.email|default:"-" }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">{{ p.get_fonction_display }}</span>
+                                        {% if p.specialite %}
+                                        <br><small class="text-muted">{{ p.specialite }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-phone small text-muted"></i> {{ p.telephone }}<br>
+                                        <i class="fas fa-map-marker-alt small text-muted"></i> {{ p.adresse|default:"-"|truncatechars:20 }}
+                                    </td>
+                                    <td>
+                                        {% if p.statut == 'ACT' %}
+                                        <span class="badge bg-success">Actif</span>
+                                        {% elif p.statut == 'CON' %}
+                                        <span class="badge bg-info">En Congé</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Inactif</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'personnel_detail' p.pk %}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'personnel_update' p.pk %}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'personnel_delete' p.pk %}" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">Aucun membre du personnel trouvé</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if personnel.has_other_pages %}
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if personnel.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ personnel.previous_page_number }}">Précédent</a>
+                            </li>
+                            {% endif %}
+                            {% for num in personnel.paginator.page_range %}
+                            {% if personnel.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
+                            {% endfor %}
+                            {% if personnel.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ personnel.next_page_number }}">Suivant</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}

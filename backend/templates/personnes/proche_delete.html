@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Supprimer Proche Aidant{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="fas fa-trash-alt"></i> Confirmation de suppression</h4>
+                </div>
+                <div class="card-body text-center">
+                    <p class="lead">Êtes-vous sûr de vouloir supprimer ce proche aidant ?</p>
+                    <div class="alert alert-secondary">
+                        <h3>{{ proche.nom_complet }}</h3>
+                        <p>{{ proche.relation }}</p>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-center mt-4">
+                            <a href="{% url 'proche_list' %}" class="btn btn-secondary me-md-2">Annuler</a>
+                            <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

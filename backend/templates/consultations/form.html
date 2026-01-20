@@ -3,8 +3,8 @@
 {% block title %}Nouvelle Consultation{% endblock %}
 
 {% block breadcrumb %}
-    <li class="breadcrumb-item"><a href="{% url 'consultation_list' %}">Consultations</a></li>
-    <li class="breadcrumb-item active">Nouvelle</li>
+<li class="breadcrumb-item"><a href="{% url 'consultation_list' %}">Consultations</a></li>
+<li class="breadcrumb-item active">Nouvelle</li>
 {% endblock %}
 
 {% block content %}
@@ -18,45 +18,67 @@
         <div class="card-body">
             <form method="post">
                 {% csrf_token %}
-                
+
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">Patient *</label>
-                            <select name="patient" class="form-select" required>
-                                <option value="">Sélectionnez un patient...</option>
-                                {% for patient in patients %}
-                                <option value="{{ patient.id }}">{{ patient.nom }} {{ patient.prenom }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ form.patient.label }}</label>
+                        {{ form.patient }}
+                        {% if form.patient.errors %}
+                        <div class="text-danger">{{ form.patient.errors }}</div>
+                        {% endif %}
                     </div>
-                    
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">Date *</label>
-                            <input type="date" name="date" class="form-control" required>
-                        </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ form.medecin.label }}</label>
+                        {{ form.medecin }}
+                        {% if form.medecin.errors %}
+                        <div class="text-danger">{{ form.medecin.errors }}</div>
+                        {% endif %}
                     </div>
                 </div>
-                
-                <div class="mb-3">
-                    <label class="form-label">Heure *</label>
-                    <input type="time" name="heure" class="form-control" required>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ form.date_consultation.label }}</label>
+                        {{ form.date_consultation }}
+                        {% if form.date_consultation.errors %}
+                        <div class="text-danger">{{ form.date_consultation.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ form.heure_consultation.label }}</label>
+                        {{ form.heure_consultation }}
+                        {% if form.heure_consultation.errors %}
+                        <div class="text-danger">{{ form.heure_consultation.errors }}</div>
+                        {% endif %}
+                    </div>
                 </div>
-                
+
                 <div class="mb-3">
-                    <label class="form-label">Motif *</label>
-                    <textarea name="motif" class="form-control" rows="3" 
-                              placeholder="Décrivez le motif de la consultation..." required></textarea>
+                    <label class="form-label">{{ form.diagnostic.label }}</label>
+                    {{ form.diagnostic }}
+                    {% if form.diagnostic.errors %}
+                    <div class="text-danger">{{ form.diagnostic.errors }}</div>
+                    {% endif %}
                 </div>
-                
+
                 <div class="mb-3">
-                    <label class="form-label">Diagnostic</label>
-                    <textarea name="diagnostic" class="form-control" rows="3" 
-                              placeholder="Diagnostic établi..."></textarea>
+                    <label class="form-label">{{ form.observations_cliniques.label }}</label>
+                    {{ form.observations_cliniques }}
+                    {% if form.observations_cliniques.errors %}
+                    <div class="text-danger">{{ form.observations_cliniques.errors }}</div>
+                    {% endif %}
                 </div>
-                
+
+                <div class="mb-3">
+                    <label class="form-label">{{ form.rendezvous.label }}</label>
+                    {{ form.rendezvous }}
+                    {% if form.rendezvous.errors %}
+                    <div class="text-danger">{{ form.rendezvous.errors }}</div>
+                    {% endif %}
+                </div>
+
                 <div class="d-flex justify-content-between">
                     <a href="{% url 'consultation_list' %}" class="btn btn-secondary">
                         <i class="fas fa-arrow-left me-1"></i> Annuler
@@ -72,13 +94,13 @@
 
 <script>
     // Pré-remplir avec la date et heure actuelles
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const today = new Date().toISOString().split('T')[0];
         document.querySelector('input[name="date"]').value = today;
-        
+
         const now = new Date();
-        const currentHour = now.getHours().toString().padStart(2, '0') + ':' + 
-                           now.getMinutes().toString().padStart(2, '0');
+        const currentHour = now.getHours().toString().padStart(2, '0') + ':' +
+            now.getMinutes().toString().padStart(2, '0');
         document.querySelector('input[name="heure"]').value = currentHour;
     });
 </script>

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Liste des Prestations{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-list-ul"></i> Prestations</h1>
+                <a href="{% url 'billing:prestation_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Nouvelle Prestation
+                </a>
+            </div>
+
+            <!-- Recherche -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-10">
+                            <input type="text" name="q" class="form-control" placeholder="Rechercher une prestation..."
+                                value="{{ request.GET.q }}">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search"></i> Rechercher
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Libellé</th>
+                                    <th>Tarif Unitaire</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prestation in prestations %}
+                                <tr>
+                                    <td>{{ prestation.libelle_acte }}</td>
+                                    <td>{{ prestation.tarif_unitaire }} FCFA</td>
+                                    <td class="text-end">
+                                        <a href="{% url 'billing:prestation_update' prestation.pk %}"
+                                            class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'billing:prestation_delete' prestation.pk %}"
+                                            class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">Aucune prestation trouvée</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if prestations.has_other_pages %}
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if prestations.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                    href="?page={{ prestations.previous_page_number }}&q={{ request.GET.q }}">Précédent</a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in prestations.paginator.page_range %}
+                            {% if prestations.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}&q={{ request.GET.q }}">{{ num }}</a></li>
+                            {% endif %}
+                            {% endfor %}
+
+                            {% if prestations.has_next %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                    href="?page={{ prestations.next_page_number }}&q={{ request.GET.q }}">Suivant</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

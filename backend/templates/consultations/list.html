@@ -3,7 +3,7 @@
 {% block title %}Consultations{% endblock %}
 
 {% block breadcrumb %}
-    <li class="breadcrumb-item active">Consultations</li>
+<li class="breadcrumb-item active">Consultations</li>
 {% endblock %}
 
 {% block content %}
@@ -26,23 +26,24 @@
             <form method="get" class="row g-3">
                 <div class="col-md-3">
                     <label class="form-label">Date début</label>
-                    <input type="date" name="date_debut" class="form-control" 
-                           value="{{ request.GET.date_debut|default:'' }}">
+                    <input type="date" name="date_debut" class="form-control"
+                        value="{{ request.GET.date_debut|default:'' }}">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Date fin</label>
-                    <input type="date" name="date_fin" class="form-control" 
-                           value="{{ request.GET.date_fin|default:'' }}">
+                    <input type="date" name="date_fin" class="form-control"
+                        value="{{ request.GET.date_fin|default:'' }}">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Médecin</label>
                     <select name="medecin" class="form-select">
                         <option value="">Tous les médecins</option>
                         {% for medecin in medecins %}
-                        <option value="{{ medecin.id }}" 
-                                {% if request.GET.medecin == medecin.id|stringformat:"s" %}selected{% endif %}>
+                        {% with m_id=medecin.id|stringformat:"s" %}
+                        <option value="{{ medecin.id }}" {% if request.GET.medecin == m_id %}selected{% endif %}>
                             Dr. {{ medecin.user.last_name }} {{ medecin.user.first_name }}
                         </option>
+                        {% endwith %}
                         {% endfor %}
                     </select>
                 </div>
@@ -77,7 +78,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-3">
             <div class="card border-start border-success border-4">
                 <div class="card-body">
@@ -93,7 +94,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-3">
             <div class="card border-start border-warning border-4">
                 <div class="card-body">
@@ -109,7 +110,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-3">
             <div class="card border-start border-info border-4">
                 <div class="card-body">
@@ -135,7 +136,7 @@
             </h5>
             <span class="badge bg-primary">{{ consultations|length }} consultation(s)</span>
         </div>
-        
+
         <div class="card-body">
             {% if consultations %}
             <div class="table-responsive">
@@ -160,8 +161,8 @@
                                 <small class="text-muted">{{ consultation.heure|time:"H:i" }}</small>
                             </td>
                             <td>
-                                <a href="{% url 'patient_detail' consultation.patient.id %}" 
-                                   class="text-decoration-none">
+                                <a href="{% url 'patient_detail' consultation.patient.id %}"
+                                    class="text-decoration-none">
                                     <strong>{{ consultation.patient.nom }} {{ consultation.patient.prenom }}</strong>
                                 </a>
                             </td>
@@ -190,23 +191,28 @@
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm">
-                                    <a href="{% url 'consultation_detail' consultation.id %}" 
-                                       class="btn btn-outline-info" title="Voir">
+                                    <a href="{% url 'consultation_detail' consultation.id %}"
+                                        class="btn btn-outline-info" title="Voir">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{% url 'consultation_update' consultation.id %}" 
-                                       class="btn btn-outline-warning" title="Modifier">
+                                    <a href="{% url 'consultation_update' consultation.id %}"
+                                        class="btn btn-outline-warning" title="Modifier">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="{% url 'consultation_delete' consultation.id %}" 
-                                       class="btn btn-outline-danger" 
-                                       title="Supprimer"
-                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette consultation ?');">
+                                    <a href="{% url 'consultation_delete' consultation.id %}"
+                                        class="btn btn-outline-danger" title="Supprimer"
+                                        onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette consultation ?');">
                                         <i class="fas fa-trash"></i>
                                     </a>
-                                    {% if consultation.ordonnance_requise %}
-                                    <a href="#" class="btn btn-outline-success" title="Ordonnance">
+                                    {% if consultation.ordonnance %}
+                                    <a href="{% url 'ordonnance_detail' consultation.ordonnance.pk %}"
+                                        class="btn btn-outline-success" title="Voir l'ordonnance">
                                         <i class="fas fa-prescription"></i>
+                                    </a>
+                                    {% else %}
+                                    <a href="{% url 'ordonnance_create' %}?consultation={{ consultation.id }}"
+                                        class="btn btn-outline-secondary" title="Créer ordonnance">
+                                        <i class="fas fa-plus-circle"></i> op
                                     </a>
                                     {% endif %}
                                 </div>
@@ -216,28 +222,32 @@
                     </tbody>
                 </table>
             </div>
-            
+
             <!-- Pagination -->
             {% if consultations.has_other_pages %}
             <nav aria-label="Pagination" class="mt-4">
                 <ul class="pagination justify-content-center">
                     {% if consultations.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ consultations.previous_page_number }}{% if request.GET.date_debut %}&date_debut={{ request.GET.date_debut }}{% endif %}{% if request.GET.date_fin %}&date_fin={{ request.GET.date_fin }}{% endif %}{% if request.GET.medecin %}&medecin={{ request.GET.medecin }}{% endif %}">
+                        <a class="page-link"
+                            href="?page={{ consultations.previous_page_number }}{% if request.GET.date_debut %}&date_debut={{ request.GET.date_debut }}{% endif %}{% if request.GET.date_fin %}&date_fin={{ request.GET.date_fin }}{% endif %}{% if request.GET.medecin %}&medecin={{ request.GET.medecin }}{% endif %}">
                             <i class="fas fa-chevron-left"></i> Précédent
                         </a>
                     </li>
                     {% endif %}
-                    
+
                     {% for num in consultations.paginator.page_range %}
                     <li class="page-item {% if consultations.number == num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ num }}{% if request.GET.date_debut %}&date_debut={{ request.GET.date_debut }}{% endif %}{% if request.GET.date_fin %}&date_fin={{ request.GET.date_fin }}{% endif %}{% if request.GET.medecin %}&medecin={{ request.GET.medecin }}{% endif %}">{{ num }}</a>
+                        <a class="page-link"
+                            href="?page={{ num }}{% if request.GET.date_debut %}&date_debut={{ request.GET.date_debut }}{% endif %}{% if request.GET.date_fin %}&date_fin={{ request.GET.date_fin }}{% endif %}{% if request.GET.medecin %}&medecin={{ request.GET.medecin }}{% endif %}">{{
+                            num }}</a>
                     </li>
                     {% endfor %}
-                    
+
                     {% if consultations.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ consultations.next_page_number }}{% if request.GET.date_debut %}&date_debut={{ request.GET.date_debut }}{% endif %}{% if request.GET.date_fin %}&date_fin={{ request.GET.date_fin }}{% endif %}{% if request.GET.medecin %}&medecin={{ request.GET.medecin }}{% endif %}">
+                        <a class="page-link"
+                            href="?page={{ consultations.next_page_number }}{% if request.GET.date_debut %}&date_debut={{ request.GET.date_debut }}{% endif %}{% if request.GET.date_fin %}&date_fin={{ request.GET.date_fin }}{% endif %}{% if request.GET.medecin %}&medecin={{ request.GET.medecin }}{% endif %}">
                             Suivant <i class="fas fa-chevron-right"></i>
                         </a>
                     </li>
@@ -245,7 +255,7 @@
                 </ul>
             </nav>
             {% endif %}
-            
+
             {% else %}
             <div class="text-center py-5">
                 <i class="fas fa-file-medical-alt fa-4x text-muted mb-3"></i>

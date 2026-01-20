@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Détail Congé{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Demande de Congé</h4>
+                    <span
+                        class="badge {% if conge.statut_conge == 'Approuvé' %}bg-success{% elif conge.statut_conge == 'Refusé' %}bg-danger{% else %}bg-warning{% endif %}">
+                        {{ conge.statut_conge }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Personnel</h5>
+                            <p class="lead">{{ conge.personnel.nom_complet }}</p>
+                            <p class="text-muted">{{ conge.personnel.get_fonction_display }}</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <h5>Type de Congé</h5>
+                            <p class="lead">{{ conge.get_type_conge_display }}</p>
+                            <p><strong>Durée:</strong> {{ duree }} jours</p>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-light border">
+                        <div class="row text-center">
+                            <div class="col-md-5">
+                                <small class="text-muted">Du</small>
+                                <h4>{{ conge.date_debut|date:"d F Y" }}</h4>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-center justify-content-center">
+                                <i class="fas fa-arrow-right text-muted"></i>
+                            </div>
+                            <div class="col-md-5">
+                                <small class="text-muted">Au</small>
+                                <h4>{{ conge.date_fin|date:"d F Y" }}</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if conge.statut_conge == 'En attente' %}
+                    <div class="d-grid gap-2 d-md-flex justify-content-center mt-4">
+                        <a href="{% url 'rh:conge_approve' conge.pk %}" class="btn btn-success me-md-2">
+                            <i class="fas fa-check"></i> Approuver
+                        </a>
+                        <a href="{% url 'rh:conge_reject' conge.pk %}" class="btn btn-danger me-md-2">
+                            <i class="fas fa-times"></i> Refuser
+                        </a>
+                        <a href="{% url 'rh:conge_update' conge.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    <div class="text-center mt-3">
+                        <a href="{% url 'rh:conge_list' %}" class="btn btn-link">Retour à la liste</a>
+                        {% if conge.statut_conge == 'En attente' %}
+                        <a href="{% url 'rh:conge_delete' conge.pk %}" class="text-danger ms-3">Supprimer la demande</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -4,8 +4,11 @@ set -o errexit
 # Installer les dépendances
 pip install -r requirements.txt
 
-# Aller dans le dossier backend
+# Aller dans backend
 cd backend
+
+# Créer le dossier static s'il n'existe pas
+mkdir -p static
 
 # Collecter les fichiers statiques
 python manage.py collectstatic --noinput

@@ -54,5 +54,9 @@ class ProcheAidant(models.Model):
     telephone = models.CharField(max_length=20)
     date_naissance = models.DateField()
     
-    def __str__(self):
+    @property
+    def nom_complet(self):
         return f"{self.prenom} {self.nom}"
+
+    def __str__(self):
+        return self.nom_complet

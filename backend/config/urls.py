@@ -2,43 +2,70 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
-from . import views
+from django.contrib.auth import views as auth_views
+# from . import views  <-- REMOVED (Replaced by core/views.py via include)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     
-    # Pages publiques
-    path('', views.index, name='index'),
+    # Core (Index, Dashboard, Auth)
+    path('', include('core.urls')),
     
-    # Authentification
-    path('accounts/login/', auth_views.LoginView.as_view(template_name='accounts/login.html'), name='login'),
-    path('accounts/logout/', auth_views.LogoutView.as_view(template_name='accounts/logout_confirm.html'), name='logout'),
+    # Modules Métier (Architecture Modulaire)
+    # Note: On garde les noms de module 'personnes', 'medical', etc.
+    # Les URL finales seront /personnes/patients/, /medical/consultations/ etc.
     
-    # Dashboard
-    path('dashboard/', views.dashboard, name='dashboard'),
-    path('dashboard/roles/', views.dashboard_roles, name='dashboard_roles'),
-    # Patients
-    path('patients/', views.patient_list, name='patient_list'),
-    path('patients/nouveau/', views.patient_create, name='patient_create'),
-    path('patients/<int:pk>/', views.patient_detail, name='patient_detail'),
-    path('patients/<int:pk>/modifier/', views.patient_update, name='patient_update'),
-    path('patients/<int:pk>/supprimer/', views.patient_delete, name='patient_delete'),
+    # IMPORTANT: Pour la compatibilité avec les anciens templates, on a 
+    # déplacé les routes /patients/, /rendezvous/ etc DANS les apps respectives.
+    # Ici on utilise include() pour déléguer. D'où path('', include(...)) pour certains si nécessaire,
+    # ou mieux, on charge explicitement les patterns.
     
-    # Rendez-vous
-    path('rendezvous/', views.rendezvous_list, name='rendezvous_list'),
-    path('rendezvous/nouveau/', views.rendezvous_create, name='rendezvous_create'),
-    path('rendezvous/<int:pk>/', views.rendezvous_detail, name='rendezvous_detail'),
-    path('rendezvous/<int:pk>/modifier/', views.rendezvous_update, name='rendezvous_update'),
-    path('rendezvous/<int:pk>/supprimer/', views.rendezvous_delete, name='rendezvous_delete'),
-    path('rendezvous/<int:pk>/annuler/', views.rendezvous_cancel, name='rendezvous_cancel'),
+    # En fait, pour respecter l'ancien schéma URL (/patients/, /rendezvous/) sans préfixe d'app forcé,
+    # on a deux choix :
+    # 1. Utiliser include('personnes.urls') à la racine path('', ...) -> risque de conflit
+    # 2. Utiliser des préfixes explicites path('personnes/', ...) -> change les URL (ex: /personnes/patients/)
     
-    # Consultations
-    path('consultations/', views.consultation_list, name='consultation_list'),
-    path('consultations/nouvelle/', views.consultation_create, name='consultation_create'),
-    path('consultations/<int:pk>/', views.consultation_detail, name='consultation_detail'),
-    path('consultations/<int:pk>/modifier/', views.consultation_update, name='consultation_update'),
-    path('consultations/<int:pk>/supprimer/', views.consultation_delete, name='consultation_delete'),
+    # D'après ma lecture des urls.py modifiés :
+    # planning/urls.py : path('', web_views.rendezvous_list) si préfixé par 'rendezvous/' dans config.
+    # personnes/urls.py : path('patients/', ...)
     
-    # API pour le calendrier
-    path('api/rendezvous/calendar/', views.rendezvous_calendar_api, name='rendezvous_calendar_api'),
+    # STRATEGIE HYBRIDE POUR COMPATIBILITÉ MAXIMALE :
+    
+    # 1. Planning (Rendez-vous)
+    # Dans planning/urls.py j'ai mis path('', ...) donc il faut le charger sous 'rendezvous/'
+    path('rendezvous/', include('planning.urls')), 
+    
+    # 2. Medical (Consultations & Ordonnances)
+    # Dans medical/urls.py j'ai mis path('consultations/', ...), path('ordonnances/'...)
+    # Donc on doit l'inclure à la racine ou sous 'medical/' ?
+    # Si je mets path('medical/', include('medical.urls')), l'URL devient /medical/consultations/.
+    # L'ancien était /consultations/.
+    
+    # Pour garder /consultations/ à la racine, je dois inclure medical.urls à la racine,
+    # MAIS medical.urls a déjà les préfixes 'consultations/' et 'ordonnances/' dedans?
+    # Vérifions : Oui, j'ai mis path('consultations/', ...) dans medical/urls.py.
+    # Donc il faut faire :
+    path('', include('medical.urls')),
+    
+    # 3. Personnes (Patients, Personnel)
+    # J'ai mis path('patients/', ...) dans personnes/urls.py
+    # Donc il faut inclure à la racine pour avoir /patients/ (et pas /personnes/patients/)
+    path('', include('personnes.urls')),
+    path('personnes/', include('personnes.urls')), # COMPATIBILITÉ: Restaure /personnes/proches/ et /personnes/personnel/
+    
+    # 4. Facturation (Billing)
+    # Lui était déjà sous 'facturation/'
+    path('facturation/', include('billing.urls')),
+    
+    # 5. RH & Services (Déjà préfixés)
+    path('rh/', include('rh.urls')),
+    path('services/', include('services.urls')),
+    
+    # Medical Compatibility
+    path('medical/', include('medical.urls')), # COMPATIBILITÉ
+    
+    # NOTE: L'inclusion multiple à '' (racine) fonctionne tant que les sous-patterns sont distincts.
+    # medical.urls commence par 'consultations/' ou 'ordonnances/'
+    # personnes.urls commence par 'patients/', 'personnel/', 'proches/'
+    # C'est parfait, pas de conflit.
 ]

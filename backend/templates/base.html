@@ -1,477 +1,491 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}🏥 Gestion Hospitalière{% endblock %}</title>
 
-    <!-- Bootstrap 5 -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <!-- Font Awesome -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}🏥 Gestion Hospitalière{% endblock %}</title>
 
-    <style>
-      :root {
-        --hospital-primary: #2c3e50;
-        --hospital-secondary: #3498db;
-        --hospital-success: #27ae60;
-        --hospital-warning: #f39c12;
-        --hospital-danger: #e74c3c;
-        --hospital-info: #17a2b8;
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --hospital-primary: #2c3e50;
+      --hospital-secondary: #3498db;
+      --hospital-success: #27ae60;
+      --hospital-warning: #f39c12;
+      --hospital-danger: #e74c3c;
+      --hospital-info: #17a2b8;
+    }
+
+    .hospital-sidebar {
+      background-color: var(--hospital-primary);
+      min-height: 100vh;
+      color: white;
+    }
+
+    .hospital-nav-link {
+      color: #ecf0f1;
+      padding: 12px 20px;
+      border-left: 4px solid transparent;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: block;
+    }
+
+    .hospital-nav-link:hover,
+    .hospital-nav-link.active {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-left-color: var(--hospital-secondary);
+      color: white;
+    }
+
+    .stat-card {
+      border-radius: 10px;
+      transition: transform 0.3s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .badge-trend-up {
+      background-color: var(--hospital-success);
+    }
+
+    .badge-trend-down {
+      background-color: var(--hospital-danger);
+    }
+
+    .badge-trend-neutral {
+      background-color: var(--hospital-info);
+    }
+
+    /* Style pour le bouton de déconnexion dans le formulaire */
+    .logout-form button {
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      padding: 0;
+    }
+
+    .logout-form button:hover {
+      background: none;
+    }
+
+    /* Styles d'impression pour PDF propre */
+    @media print {
+
+      /* Masquer la navigation et les éléments UI */
+      .hospital-sidebar,
+      .sidebar,
+      nav,
+      .breadcrumb,
+      .no-print,
+      button,
+      .btn,
+      footer {
+        display: none !important;
       }
 
-      .hospital-sidebar {
-        background-color: var(--hospital-primary);
-        min-height: 100vh;
-        color: white;
+      /* Supprimer les marges et paddings du container */
+      .container-fluid,
+      .row {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
       }
 
-      .hospital-nav-link {
-        color: #ecf0f1;
-        padding: 12px 20px;
-        border-left: 4px solid transparent;
-        transition: all 0.3s;
-        text-decoration: none;
-        display: block;
+      /* Contenu principal en pleine largeur */
+      .col-md-10,
+      .col-lg-10,
+      main {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 20px !important;
       }
 
-      .hospital-nav-link:hover,
-      .hospital-nav-link.active {
-        background-color: rgba(255, 255, 255, 0.1);
-        border-left-color: var(--hospital-secondary);
-        color: white;
+      /* Fond blanc pour l'impression */
+      body {
+        background-color: white !important;
       }
 
-      .stat-card {
-        border-radius: 10px;
-        transition: transform 0.3s;
+      /* Supprimer les ombres et bordures */
+      .card {
+        box-shadow: none !important;
       }
+    }
+  </style>
 
-      .stat-card:hover {
-        transform: translateY(-5px);
-      }
+  {% block extra_css %}{% endblock %}
+</head>
 
-      .badge-trend-up {
-        background-color: var(--hospital-success);
-      }
-      .badge-trend-down {
-        background-color: var(--hospital-danger);
-      }
-      .badge-trend-neutral {
-        background-color: var(--hospital-info);
-      }
+<body>
+  {% load core_extras %}
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-2 col-lg-2 d-md-block hospital-sidebar sidebar collapse show" id="sidebar">
+        <div class="position-sticky pt-3">
+          <!-- Logo et titre -->
+          <div class="text-center mb-4 pt-3">
+            <h4 class="text-white">
+              <i class="fas fa-hospital"></i>
+              <span class="d-none d-md-inline">Hôpital Manager</span>
+            </h4>
+            <small class="text-muted">Système de Gestion</small>
+          </div>
 
-      /* Style pour le bouton de déconnexion dans le formulaire */
-      .logout-form button {
-        background: none;
-        border: none;
-        width: 100%;
-        text-align: left;
-        padding: 0;
-      }
+          <!-- Navigation -->
+          <ul class="nav flex-column mb-auto">
+            <li class="nav-item">
+              <a href="{% url 'dashboard' %}"
+                class="nav-link hospital-nav-link {% if request.path == '/dashboard/' %}active{% endif %}">
+                <i class="fas fa-tachometer-alt me-2"></i>
+                <span class="d-none d-md-inline">Tableau de bord</span>
+              </a>
+            </li>
 
-      .logout-form button:hover {
-        background: none;
-      }
-    </style>
+            <li class="nav-item">
+              <a href="{% url 'patient_list'%}" class="nav-link hospital-nav-link">
+                <i class="fas fa-users me-2"></i>
+                <span class="d-none d-md-inline">Patients</span>
+              </a>
+            </li>
 
-    {% block extra_css %}{% endblock %}
-  </head>
-  <body>
-    <div class="container-fluid">
-      <div class="row">
-        <!-- Sidebar -->
-        <div
-          class="col-md-2 col-lg-2 d-md-block hospital-sidebar sidebar collapse show"
-          id="sidebar"
-        >
-          <div class="position-sticky pt-3">
-            <!-- Logo et titre -->
-            <div class="text-center mb-4 pt-3">
-              <h4 class="text-white">
-                <i class="fas fa-hospital"></i>
-                <span class="d-none d-md-inline">Hôpital Manager</span>
-              </h4>
-              <small class="text-muted">Système de Gestion</small>
-            </div>
+            {% if user|has_role:"ADMIN,DIR,RES" %}
+            <li class="nav-item">
+              <a href="{% url 'personnel_list' %}" class="nav-link hospital-nav-link">
+                <i class="fas fa-user-md me-2"></i>
+                <span class="d-none d-md-inline">Personnel</span>
+              </a>
+            </li>
+            {% endif %}
 
-            <!-- Navigation -->
-            <ul class="nav flex-column mb-auto">
-              <li class="nav-item">
-                <a
-                  href="{% url 'dashboard' %}"
-                  class="nav-link hospital-nav-link {% if request.path == '/dashboard/' %}active{% endif %}"
-                >
-                  <i class="fas fa-tachometer-alt me-2"></i>
-                  <span class="d-none d-md-inline">Tableau de bord</span>
-                </a>
-              </li>
+            {% if user|has_role:"MED,INF,ADM" %}
+            <li class="nav-item">
+              <a href="{% url 'rendezvous_list' %}" class="nav-link hospital-nav-link">
+                <i class="fas fa-calendar-alt me-2"></i>
+                <span class="d-none d-md-inline">Rendez-vous</span>
+              </a>
+            </li>
+            {% endif %}
 
-              <li class="nav-item">
-                <a href="{% url 'patient_list'%}" class="nav-link hospital-nav-link">
-                    <i class="fas fa-users me-2"></i>
-                    <span class="d-none d-md-inline">Patients</span>
-                </a>
-              </li>
+            {% if user|has_role:"MED,INF" %}
+            <li class="nav-item">
+              <a href="{% url 'consultation_list' %}" class="nav-link hospital-nav-link">
+                <i class="fas fa-stethoscope me-2"></i>
+                <span class="d-none d-md-inline">Consultations</span>
+              </a>
+            </li>
+            {% endif %}
 
-              <li class="nav-item">
-                <a href="#" class="nav-link hospital-nav-link">
-                  <i class="fas fa-user-md me-2"></i>
-                  <span class="d-none d-md-inline">Personnel</span>
-                </a>
-              </li>
+            {% if user|has_role:"CAI,ADM,DIR" %}
+            <li class="nav-item">
+              <a href="{% url 'billing:facture_list' %}" class="nav-link hospital-nav-link">
+                <i class="fas fa-file-invoice-dollar me-2"></i>
+                <span class="d-none d-md-inline">Facturation</span>
+              </a>
+            </li>
+            {% endif %}
 
-              <li class="nav-item">
-                <a
-                  href="{% url 'rendezvous_list' %}"
-                  class="nav-link hospital-nav-link"
-                >
-                  <i class="fas fa-calendar-alt me-2"></i>
-                  <span class="d-none d-md-inline">Rendez-vous</span>
-                </a>
-              </li>
+            {% if user|has_role:"ADMIN,DIR,RES" %}
+            <li class="nav-item">
+              <a href="{% url 'services:service_list' %}" class="nav-link hospital-nav-link">
+                <i class="fas fa-procedures me-2"></i>
+                <span class="d-none d-md-inline">Services</span>
+              </a>
+            </li>
+            {% endif %}
 
-              <li class="nav-item">
-                <a
-                  href="{% url 'consultation_list' %}"
-                  class="nav-link hospital-nav-link"
-                >
-                  <i class="fas fa-stethoscope me-2"></i>
-                  <span class="d-none d-md-inline">Consultations</span>
-                </a>
-              </li>
+            {% if user|has_role:"ADMIN,DIR,RES" %}
+            <li class="nav-item">
+              <a href="{% url 'rh:conge_list' %}" class="nav-link hospital-nav-link">
+                <i class="fas fa-umbrella-beach me-2"></i>
+                <span class="d-none d-md-inline">Congés</span>
+              </a>
+            </li>
+            {% endif %}
 
-              <li class="nav-item">
-                <a href="#" class="nav-link hospital-nav-link">
-                  <i class="fas fa-file-prescription me-2"></i>
-                  <span class="d-none d-md-inline">Ordonnances</span>
-                </a>
-              </li>
+            <li class="nav-item">
+              <a href="{% url 'proche_list' %}" class="nav-link hospital-nav-link">
+                <i class="fas fa-hands-helping me-2"></i>
+                <span class="d-none d-md-inline">Proches Aidants</span>
+              </a>
+            </li>
 
-              <li class="nav-item">
-                <a href="#" class="nav-link hospital-nav-link">
-                  <i class="fas fa-file-invoice-dollar me-2"></i>
-                  <span class="d-none d-md-inline">Facturation</span>
-                </a>
-              </li>
+            <hr class="text-white-50 my-3" />
 
-              <li class="nav-item">
-                <a href="#" class="nav-link hospital-nav-link">
-                  <i class="fas fa-procedures me-2"></i>
-                  <span class="d-none d-md-inline">Services</span>
-                </a>
-              </li>
+            <li class="nav-item">
+              <a href="{% url 'admin:index' %}" class="nav-link hospital-nav-link">
+                <i class="fas fa-cog me-2"></i>
+                <span class="d-none d-md-inline">Administration</span>
+              </a>
+            </li>
 
-              <li class="nav-item">
-                <a href="#" class="nav-link hospital-nav-link">
-                  <i class="fas fa-umbrella-beach me-2"></i>
-                  <span class="d-none d-md-inline">Congés</span>
-                </a>
-              </li>
+            {% if user|has_role:"ADMIN,DIR" %}
+            <li class="nav-item">
+              <a href="{% url 'admin_create_user' %}" class="nav-link hospital-nav-link">
+                <i class="fas fa-user-plus me-2"></i>
+                <span class="d-none d-md-inline">Gestion Utilisateurs</span>
+              </a>
+            </li>
+            {% endif %}
 
-              <hr class="text-white-50 my-3" />
+            <!-- DÉCONNEXION CORRIGÉE - Formulaire POST -->
+            <li class="nav-item logout-form">
+              <form method="post" action="{% url 'logout' %}" class="d-inline w-100">
+                {% csrf_token %}
+                <button type="submit" class="nav-link hospital-nav-link text-danger w-100 text-start">
+                  <i class="fas fa-sign-out-alt me-2"></i>
+                  <span class="d-none d-md-inline">Déconnexion</span>
+                </button>
+              </form>
+            </li>
+          </ul>
 
-              <li class="nav-item">
-                <a
-                  href="{% url 'admin:index' %}"
-                  class="nav-link hospital-nav-link"
-                >
-                  <i class="fas fa-cog me-2"></i>
-                  <span class="d-none d-md-inline">Administration</span>
-                </a>
-              </li>
-
-              <!-- DÉCONNEXION CORRIGÉE - Formulaire POST -->
-              <li class="nav-item logout-form">
-                <form
-                  method="post"
-                  action="{% url 'logout' %}"
-                  class="d-inline w-100"
-                >
-                  {% csrf_token %}
-                  <button
-                    type="submit"
-                    class="nav-link hospital-nav-link text-danger w-100 text-start"
-                  >
-                    <i class="fas fa-sign-out-alt me-2"></i>
-                    <span class="d-none d-md-inline">Déconnexion</span>
-                  </button>
-                </form>
-              </li>
-            </ul>
-
-            <!-- User info -->
-            <div class="mt-auto p-3 border-top border-secondary">
-              <div class="d-flex align-items-center">
-                <div class="flex-shrink-0">
-                  <i class="fas fa-user-circle fa-2x text-white-50"></i>
-                </div>
-                <div class="flex-grow-1 ms-3 d-none d-md-block">
-                  <small class="text-white-50">Connecté en tant que</small>
-                  <div class="text-white">
-                    {% if user.is_authenticated %}
-                        {{ user.get_full_name|default:user.username }}
-                        {% if user.groups.all %}
-                             <br /><small class="text-white-50">
-                                   {{ user.groups.first.name }}
-                             </small>
-                        {% endif %}
-                    {% else %}
-                        Invité
-                    {% endif %}
-                  </div>
+          <!-- User info -->
+          <div class="mt-auto p-3 border-top border-secondary">
+            <div class="d-flex align-items-center">
+              <div class="flex-shrink-0">
+                <i class="fas fa-user-circle fa-2x text-white-50"></i>
+              </div>
+              <div class="flex-grow-1 ms-3 d-none d-md-block">
+                <small class="text-white-50">Connecté en tant que</small>
+                <div class="text-white">
+                  {% if user.is_authenticated %}
+                  {{ user.get_full_name|default:user.username }}
+                  {% if user.groups.all %}
+                  <br /><small class="text-white-50">
+                    {{ user.groups.first.name }}
+                  </small>
+                  {% endif %}
+                  {% else %}
+                  Invité
+                  {% endif %}
                 </div>
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Main content -->
-        <div class="col-md-10 col-lg-10 ms-sm-auto px-md-4">
-          <!-- Top navbar -->
-          <nav
-            class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-3"
-          >
-            <div class="container-fluid">
-              <button
-                class="btn btn-outline-secondary d-md-none"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#sidebar"
-              >
-                <i class="fas fa-bars"></i>
-              </button>
-
-              <!-- Breadcrumb ou titre de page -->
-              <nav aria-label="breadcrumb" class="ms-3">
-                <ol class="breadcrumb mb-0">
-                  <li class="breadcrumb-item">
-                    <a href="{% url 'dashboard' %}">Dashboard</a>
-                  </li>
-                  {% block breadcrumb %}{% endblock %}
-                </ol>
-              </nav>
-
-              <div class="navbar-nav ms-auto">
-                <div class="nav-item dropdown">
-                  <a
-                    class="nav-link dropdown-toggle"
-                    href="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                  >
-                    <i class="fas fa-bell"></i>
-                    {% if rdv_en_attente %}
-                    <span class="badge bg-danger rounded-pill"
-                      >{{ rdv_en_attente }}</span
-                    >
-                    {% else %}
-                    <span class="badge bg-danger rounded-pill">0</span>
-                    {% endif %}
-                  </a>
-                  <ul class="dropdown-menu dropdown-menu-end">
-                    <li>
-                      <a
-                        class="dropdown-item"
-                        href="{% url 'rendezvous_list' %}?status=today"
-                      >
-                        <i class="fas fa-user-clock me-2"></i>
-                        {{ consultations_aujourdhui|default:"0" }} consultations
-                        aujourd'hui
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        <i class="fas fa-file-invoice me-2"></i>
-                        {{ paiements_du_jour|default:"0" }} paiements du jour
-                      </a>
-                    </li>
-                    <li><hr class="dropdown-divider" /></li>
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        <i class="fas fa-cog me-2"></i> Paramètres
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-                <!-- User dropdown -->
-                {% if user.is_authenticated %}
-                <div class="nav-item dropdown">
-                  <a
-                    class="nav-link dropdown-toggle"
-                    href="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                  >
-                    <i class="fas fa-user-circle"></i>
-                    <span class="ms-1 d-none d-md-inline"
-                      >{{ user.username }}</span
-                    >
-                  </a>
-                  <ul class="dropdown-menu dropdown-menu-end">
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        <i class="fas fa-user me-2"></i> Mon profil
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        <i class="fas fa-cog me-2"></i> Paramètres
-                      </a>
-                    </li>
-                    <li><hr class="dropdown-divider" /></li>
-                    <li>
-                      <form
-                        method="post"
-                        action="{% url 'logout' %}"
-                        class="d-inline w-100"
-                      >
-                        {% csrf_token %}
-                        <button type="submit" class="dropdown-item text-danger">
-                          <i class="fas fa-sign-out-alt me-2"></i> Déconnexion
-                        </button>
-                      </form>
-                    </li>
-                  </ul>
-                </div>
-                {% endif %}
-              </div>
-            </div>
-          </nav>
-
-          <!-- Messages Django -->
-          {% if messages %}
-          <div class="container-fluid mt-3">
-            {% for message in messages %}
-            <div
-              class="alert alert-{{ message.tags }} alert-dismissible fade show"
-            >
-              <i
-                class="fas {% if message.tags == 'success' %}fa-check-circle {% elif message.tags == 'error' or message.tags == 'danger' %}fa-exclamation-circle {% elif message.tags == 'warning' %}fa-exclamation-triangle {% elif message.tags == 'info' %}fa-info-circle {% else %}fa-info-circle{% endif %} me-2"
-              ></i>
-              {{ message }}
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="alert"
-              ></button>
-            </div>
-            {% endfor %}
-          </div>
-          {% endif %}
-
-          <!-- Main content block -->
-          <main class="py-4">{% block content %}{% endblock %}</main>
-
-          <!-- Footer -->
-          <footer class="border-top pt-3 mt-5">
-            <div class="container-fluid">
-              <div class="row">
-                <div class="col-md-6">
-                  <p class="text-muted">
-                    <small>
-                      <i class="fas fa-hospital me-1"></i>
-                      Système de Gestion Hospitalière •
-                      <span id="current-time"></span>
-                    </small>
-                  </p>
-                </div>
-                <div class="col-md-6 text-end">
-                  <p class="text-muted">
-                    <small>
-                      © {% now "Y" %} •
-                      <span id="user-count">
-                        {% if user.is_authenticated %}Connecté{% else
-                        %}Déconnecté{% endif %}
-                      </span>
-                    </small>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </footer>
         </div>
       </div>
+
+      <!-- Main content -->
+      <div class="col-md-10 col-lg-10 ms-sm-auto px-md-4">
+        <!-- Top navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-3">
+          <div class="container-fluid">
+            <button class="btn btn-outline-secondary d-md-none" type="button" data-bs-toggle="collapse"
+              data-bs-target="#sidebar">
+              <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Breadcrumb ou titre de page -->
+            <nav aria-label="breadcrumb" class="ms-3">
+              <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item">
+                  <a href="{% url 'dashboard' %}">Dashboard</a>
+                </li>
+                {% block breadcrumb %}{% endblock %}
+              </ol>
+            </nav>
+
+            <div class="navbar-nav ms-auto">
+              <div class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                  <i class="fas fa-bell"></i>
+                  {% if rdv_en_attente %}
+                  <span class="badge bg-danger rounded-pill">{{ rdv_en_attente }}</span>
+                  {% else %}
+                  <span class="badge bg-danger rounded-pill">0</span>
+                  {% endif %}
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="{% url 'rendezvous_list' %}?status=today">
+                      <i class="fas fa-user-clock me-2"></i>
+                      {{ consultations_aujourdhui|default:"0" }} consultations
+                      aujourd'hui
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#">
+                      <i class="fas fa-file-invoice me-2"></i>
+                      {{ paiements_du_jour|default:"0" }} paiements du jour
+                    </a>
+                  </li>
+                  <li>
+                    <hr class="dropdown-divider" />
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#">
+                      <i class="fas fa-cog me-2"></i> Paramètres
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- User dropdown -->
+              {% if user.is_authenticated %}
+              <div class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                  <i class="fas fa-user-circle"></i>
+                  <span class="ms-1 d-none d-md-inline">{{ user.username }}</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="#">
+                      <i class="fas fa-user me-2"></i> Mon profil
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#">
+                      <i class="fas fa-cog me-2"></i> Paramètres
+                    </a>
+                  </li>
+                  <li>
+                    <hr class="dropdown-divider" />
+                  </li>
+                  <li>
+                    <form method="post" action="{% url 'logout' %}" class="d-inline w-100">
+                      {% csrf_token %}
+                      <button type="submit" class="dropdown-item text-danger">
+                        <i class="fas fa-sign-out-alt me-2"></i> Déconnexion
+                      </button>
+                    </form>
+                  </li>
+                </ul>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </nav>
+
+        <!-- Messages Django -->
+        {% if messages %}
+        <div class="container-fluid mt-3">
+          {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+            <i
+              class="fas {% if message.tags == 'success' %}fa-check-circle {% elif message.tags == 'error' or message.tags == 'danger' %}fa-exclamation-circle {% elif message.tags == 'warning' %}fa-exclamation-triangle {% elif message.tags == 'info' %}fa-info-circle {% else %}fa-info-circle{% endif %} me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Main content block -->
+        <main class="py-4">{% block content %}{% endblock %}</main>
+
+        <!-- Footer -->
+        <footer class="border-top pt-3 mt-5">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-md-6">
+                <p class="text-muted">
+                  <small>
+                    <i class="fas fa-hospital me-1"></i>
+                    Système de Gestion Hospitalière •
+                    <span id="current-time"></span>
+                  </small>
+                </p>
+              </div>
+              <div class="col-md-6 text-end">
+                <p class="text-muted">
+                  <small>
+                    © {% now "Y" %} •
+                    <span id="user-count">
+                      {% if user.is_authenticated %}Connecté{% else %}Déconnecté{% endif %}
+                    </span>
+                  </small>
+                </p>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
     </div>
+  </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <script>
-      // Toggle sidebar on mobile
-      document.addEventListener("DOMContentLoaded", function () {
-        const sidebar = document.getElementById("sidebar");
-        const sidebarToggle = document.querySelector(
-          '[data-bs-target="#sidebar"]'
-        );
+  <script>
+    // Toggle sidebar on mobile
+    document.addEventListener("DOMContentLoaded", function () {
+      const sidebar = document.getElementById("sidebar");
+      const sidebarToggle = document.querySelector(
+        '[data-bs-target="#sidebar"]'
+      );
 
-        if (sidebarToggle) {
-          sidebarToggle.addEventListener("click", function () {
-            sidebar.classList.toggle("collapse");
-            sidebar.classList.toggle("show");
-          });
+      if (sidebarToggle) {
+        sidebarToggle.addEventListener("click", function () {
+          sidebar.classList.toggle("collapse");
+          sidebar.classList.toggle("show");
+        });
+      }
+
+      // Active nav link
+      const currentPath = window.location.pathname;
+      document.querySelectorAll(".hospital-nav-link").forEach((link) => {
+        const linkHref = link.getAttribute("href");
+        if (
+          linkHref &&
+          currentPath.startsWith(linkHref) &&
+          linkHref !== "/"
+        ) {
+          link.classList.add("active");
         }
+      });
 
-        // Active nav link
-        const currentPath = window.location.pathname;
-        document.querySelectorAll(".hospital-nav-link").forEach((link) => {
-          const linkHref = link.getAttribute("href");
-          if (
-            linkHref &&
-            currentPath.startsWith(linkHref) &&
-            linkHref !== "/"
-          ) {
-            link.classList.add("active");
-          }
+      // Mettre à jour l'heure en temps réel
+      function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString("fr-FR", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
+        const dateString = now.toLocaleDateString("fr-FR", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
         });
 
-        // Mettre à jour l'heure en temps réel
-        function updateTime() {
-          const now = new Date();
-          const timeString = now.toLocaleTimeString("fr-FR", {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          });
-          const dateString = now.toLocaleDateString("fr-FR", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          });
-
-          const timeElement = document.getElementById("current-time");
-          if (timeElement) {
-            timeElement.textContent = `${dateString} • ${timeString}`;
-          }
+        const timeElement = document.getElementById("current-time");
+        if (timeElement) {
+          timeElement.textContent = `${dateString} • ${timeString}`;
         }
+      }
 
-        updateTime();
-        setInterval(updateTime, 1000);
+      updateTime();
+      setInterval(updateTime, 1000);
 
-        // Gestion des formulaires de déconnexion
-        document
-          .querySelectorAll(".logout-form button, .dropdown-item.text-danger")
-          .forEach((button) => {
-            button.addEventListener("click", function (e) {
-              if (!confirm("Êtes-vous sûr de vouloir vous déconnecter ?")) {
-                e.preventDefault();
-              }
-            });
+      // Gestion des formulaires de déconnexion
+      document
+        .querySelectorAll(".logout-form button, .dropdown-item.text-danger")
+        .forEach((button) => {
+          button.addEventListener("click", function (e) {
+            if (!confirm("Êtes-vous sûr de vouloir vous déconnecter ?")) {
+              e.preventDefault();
+            }
           });
-      });
-    </script>
+        });
+    });
+  </script>
 
-    {% block extra_js %}{% endblock %}
-  </body>
+  {% block extra_js %}{% endblock %}
+</body>
+
 </html>

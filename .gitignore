@@ -21,3 +21,9 @@ staticfiles/
 
 # OS
 .DS_Store
+
+# .gitignore - vérifiez que ces lignes existent
+.env
+*.env
+.env.local
+.env.*.local

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Détail Ordonnance #{{ ordonnance.id }}{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'ordonnance_list' %}">Ordonnances</a></li>
+<li class="breadcrumb-item active">#{{ ordonnance.id }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+        <h1>Ordonnance #{{ ordonnance.id }}</h1>
+        <div>
+            <button onclick="window.print()" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-print me-1"></i> Imprimer
+            </button>
+            <a href="{% url 'ordonnance_update' ordonnance.id %}" class="btn btn-warning">
+                <i class="fas fa-edit me-1"></i> Modifier
+            </a>
+        </div>
+    </div>
+
+    <!-- Feuille d'ordonnance style papier -->
+    <div class="card shadow p-5 mb-5" style="border-top: 5px solid #3498db;">
+        <div class="row mb-5 border-bottom pb-4">
+            <div class="col-6">
+                <h4 class="text-primary fw-bold">HÔPITAL GENERAL</h4>
+                <p class="mb-0">Service Médical</p>
+                <p class="mb-0">123 Avenue de la Santé</p>
+                <p class="text-muted">Tél: 01 23 45 67 89</p>
+            </div>
+            <div class="col-6 text-end">
+                <h5>Dr. {{ ordonnance.consultation.medecin.nom_complet }}</h5>
+                <p class="text-muted">{{ ordonnance.consultation.medecin.specialite|default:"Médecin Généraliste" }}</p>
+                <p class="mt-4">
+                    <strong>Date:</strong> {{ ordonnance.date_creation|date:"d/m/Y" }}
+                </p>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-12">
+                <h5 class="text-uppercase text-muted small fw-bold mb-3">Patient</h5>
+                <h4>{{ ordonnance.consultation.patient.nom_complet }}</h4>
+                <p>Né(e) le {{ ordonnance.consultation.patient.date_naissance|date:"d/m/Y" }}</p>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-12">
+                <h3 class="text-center mb-4 text-decoration-underline">O R D O N N A N C E</h3>
+                <div class="p-4 bg-light rounded lead"
+                    style="white-space: pre-wrap; font-family: 'Courier New', monospace;">{{ ordonnance.contenu_medical }}</div>
+            </div>
+        </div>
+
+        <div class="row mt-5 pt-5">
+            <div class="col-6 offset-6 text-center">
+                <p class="mb-5">Signature / Cachet</p>
+                <div style="height: 50px; border-bottom: 2px dashed #ccc;"></div>
+            </div>
+        </div>
+
+        <div class="row mt-5 pt-3 border-top text-center text-muted small no-print">
+            <div class="col-12">
+                Consultation associée: <a href="{% url 'consultation_detail' ordonnance.consultation.id %}">#{{ ordonnance.consultation.id }}</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+
+        .card {
+            box-shadow: none !important;
+            border: none !important;
+        }
+
+        body {
+            background-color: white !important;
+        }
+
+        .container {
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+    }
+</style>
+{% endblock %}

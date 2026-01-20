@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Détail Consultation #{{ consultation.id }}{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'consultation_list' %}">Consultations</a></li>
+<li class="breadcrumb-item active">Détail #{{ consultation.id }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-file-medical text-primary me-2"></i> Consultation #{{ consultation.id }}
+        </h1>
+        <div>
+            <a href="{% url 'consultation_update' consultation.id %}" class="btn btn-warning">
+                <i class="fas fa-edit me-1"></i> Modifier
+            </a>
+            <a href="{% url 'consultation_list' %}" class="btn btn-secondary ms-2">
+                <i class="fas fa-arrow-left me-1"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Informations principales -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> Informations Cliniques</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <label class="text-muted small text-uppercase fw-bold">Diagnostic</label>
+                        <p class="lead">{{ consultation.diagnostic|default:"Aucun diagnostic renseigné"|linebreaks }}
+                        </p>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-muted small text-uppercase fw-bold">Observations Cliniques</label>
+                        <p>{{ consultation.observations_cliniques|default:"Aucune observation"|linebreaks }}</p>
+                    </div>
+
+                    {% if consultation.ordonnance %}
+                    <hr>
+                    <div class="d-flex align-items-center justify-content-between bg-light p-3 rounded">
+                        <div>
+                            <h6 class="mb-1"><i class="fas fa-prescription text-success me-2"></i> Ordonnance associée
+                            </h6>
+                            <small class="text-muted">Créée le {{ consultation.ordonnance.date_creation|date:"d/m/Y H:i" }}</small>
+                        </div>
+                        <a href="{% url 'ordonnance_detail' consultation.ordonnance.pk %}"
+                            class="btn btn-sm btn-outline-success">
+                            Voir l'ordonnance <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                    {% else %}
+                    <hr>
+                    <div class="text-center py-3">
+                        <p class="text-muted mb-2">Aucune ordonnance associée à cette consultation.</p>
+                        <a href="{% url 'ordonnance_create' %}?consultation={{ consultation.id }}"
+                            class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-plus me-1"></i> Créer une ordonnance
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <!-- Info Patient -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-injured me-2"></i> Patient</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0">
+                            <div class="bg-light rounded-circle p-3">
+                                <i class="fas fa-user fa-2x text-primary"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="mb-0">{{ consultation.patient.nom }} {{ consultation.patient.prenom }}</h5>
+                            <small class="text-muted">Né(e) le {{ consultation.patient.date_naissance|date:"d/m/Y" }}</small>
+                        </div>
+                    </div>
+
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item px-0">
+                            <strong>Groupe Sanguin:</strong>
+                            <span class="float-end badge bg-danger">{{ consultation.patient.groupe_sanguin|default:"N/A" }}</span>
+                        </li>
+                        <li class="list-group-item px-0">
+                            <strong>Contact:</strong>
+                            <span class="float-end">{{ consultation.patient.telephone }}</span>
+                        </li>
+                    </ul>
+                    <div class="d-grid mt-3">
+                        <a href="{% url 'patient_detail' consultation.patient.id %}"
+                            class="btn btn-outline-primary btn-sm">
+                            Voir dossier patient
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Détails RDV -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i> Détails</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-3">
+                            <small class="text-muted d-block">Date et Heure</small>
+                            <strong>{{ consultation.date_consultation|date:"l d F Y" }}</strong><br>
+                            à {{ consultation.heure_consultation|time:"H:i" }}
+                        </li>
+                        <li class="mb-3">
+                            <small class="text-muted d-block">Médecin</small>
+                            {% if consultation.medecin %}
+                            <strong>Dr. {{ consultation.medecin.user.last_name }} {{ consultation.medecin.user.first_name }}</strong>
+                            {% else %}
+                            <span class="text-muted">Non assigné</span>
+                            {% endif %}
+                        </li>
+                        {% if consultation.rendezvous %}
+                        <li>
+                            <small class="text-muted d-block">Rendez-vous associé</small>
+                            <a href="{% url 'rendezvous_detail' consultation.rendezvous.id %}">
+                                Voir le RDV #{{ consultation.rendezvous.id }}
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

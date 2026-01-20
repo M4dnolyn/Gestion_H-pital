@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load core_extras %}
 
 {% block title %}Tableau de bord - Gestion Hospitalière{% endblock %}
 
@@ -15,7 +16,7 @@
             </span>
         </div>
     </div>
-    
+
     <!-- Indicateurs clés -->
     <div class="row mb-4">
         <div class="col-xl-3 col-md-6 mb-4">
@@ -40,7 +41,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card stat-card border-start border-success border-4">
                 <div class="card-body">
@@ -63,7 +64,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card stat-card border-start border-warning border-4">
                 <div class="card-body">
@@ -86,7 +87,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card stat-card border-start border-info border-4">
                 <div class="card-body">
@@ -110,7 +111,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Deux colonnes principales -->
     <div class="row">
         <!-- Colonne gauche -->
@@ -125,19 +126,19 @@
                 <div class="card-body">
                     <div class="list-group list-group-flush">
                         {% if patients_recents %}
-                            {% for patient in patients_recents %}
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1">{{ patient.nom }} {{ patient.prenom }}</h6>
-                                    <small class="text-muted">{{ patient.date_creation|date:"d/m/Y" }}</small>
-                                </div>
-                                <span class="badge bg-warning">Nouveau</span>
+                        {% for patient in patients_recents %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ patient.nom }} {{ patient.prenom }}</h6>
+                                <small class="text-muted">{{ patient.date_creation|date:"d/m/Y" }}</small>
                             </div>
-                            {% endfor %}
+                            <span class="badge bg-warning">Nouveau</span>
+                        </div>
+                        {% endfor %}
                         {% else %}
-                            <div class="list-group-item text-center text-muted py-3">
-                                Aucun patient récent
-                            </div>
+                        <div class="list-group-item text-center text-muted py-3">
+                            Aucun patient récent
+                        </div>
                         {% endif %}
                     </div>
                     <div class="text-end mt-3">
@@ -147,7 +148,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Rendez-vous à venir -->
             <div class="card mb-4">
                 <div class="card-header bg-white py-3">
@@ -157,33 +158,33 @@
                 </div>
                 <div class="card-body">
                     {% if prochains_rdv %}
-                        {% for rdv in prochains_rdv %}
-                        <div class="d-flex align-items-center border-bottom pb-3 mb-3">
-                            <div class="flex-shrink-0">
-                                <div class="bg-primary text-white rounded-circle p-3">
-                                    <i class="fas fa-clock fa-lg"></i>
-                                </div>
+                    {% for rdv in prochains_rdv %}
+                    <div class="d-flex align-items-center border-bottom pb-3 mb-3">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary text-white rounded-circle p-3">
+                                <i class="fas fa-clock fa-lg"></i>
                             </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h5 class="mb-1">{{ rdv.patient.nom }} {{ rdv.patient.prenom }}</h5>
-                                <p class="mb-0 text-muted">
-                                    {% if rdv.medecin %}
-                                    Dr. {{ rdv.medecin.user.last_name }} • 
-                                    {% endif %}
-                                    {{ rdv.heure_debut|time:"H:i" }} • {{ rdv.type }}
-                                </p>
-                            </div>
-                            <a href="{% url 'rendezvous_detail' rdv.id %}" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-eye me-1"></i> Voir
-                            </a>
                         </div>
-                        {% endfor %}
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="mb-1">{{ rdv.patient.nom }} {{ rdv.patient.prenom }}</h5>
+                            <p class="mb-0 text-muted">
+                                {% if rdv.medecin %}
+                                Dr. {{ rdv.medecin.user.last_name }} •
+                                {% endif %}
+                                {{ rdv.heure_rdv|time:"H:i" }} • {{ rdv.type }}
+                            </p>
+                        </div>
+                        <a href="{% url 'rendezvous_detail' rdv.id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye me-1"></i> Voir
+                        </a>
+                    </div>
+                    {% endfor %}
                     {% else %}
-                        <div class="text-center text-muted py-3">
-                            Aucun rendez-vous à venir
-                        </div>
+                    <div class="text-center text-muted py-3">
+                        Aucun rendez-vous à venir
+                    </div>
                     {% endif %}
-                    
+
                     <div class="text-center">
                         <a href="{% url 'rendezvous_create' %}" class="btn btn-primary">
                             <i class="fas fa-calendar-plus me-2"></i> Nouveau rendez-vous
@@ -192,7 +193,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Colonne droite -->
         <div class="col-lg-4">
             <!-- Accès rapide -->
@@ -204,36 +205,53 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-2">
+                        {% if user|has_role:"MED,INF,ADM" %}
                         <div class="col-6">
                             <a href="{% url 'rendezvous_list' %}" class="btn btn-outline-primary w-100 mb-2">
                                 <i class="fas fa-calendar-alt me-1"></i> Rendez-vous
                             </a>
                         </div>
+                        {% endif %}
+
+                        {% if user|has_role:"MED,INF" %}
                         <div class="col-6">
                             <a href="{% url 'consultation_list' %}" class="btn btn-outline-success w-100 mb-2">
                                 <i class="fas fa-stethoscope me-1"></i> Consultations
                             </a>
                         </div>
+                        {% endif %}
+
+                        {% if user|has_role:"MED,INF" %}
                         <div class="col-6">
-                            <a href="#" class="btn btn-outline-info w-100 mb-2">
+                            <a href="{% url 'ordonnance_list' %}" class="btn btn-outline-info w-100 mb-2">
                                 <i class="fas fa-file-prescription me-1"></i> Ordonnances
                             </a>
                         </div>
+                        {% endif %}
+
+                        {% if user|has_role:"CAI,ADM,DIR" %}
                         <div class="col-6">
-                            <a href="#" class="btn btn-outline-warning w-100 mb-2">
+                            <a href="{% url 'billing:facture_list' %}" class="btn btn-outline-warning w-100 mb-2">
                                 <i class="fas fa-file-invoice-dollar me-1"></i> Facturation
                             </a>
                         </div>
+                        {% endif %}
+
+                        {% if user|has_role:"ADMIN,DIR,RES" %}
                         <div class="col-6">
-                            <a href="#" class="btn btn-outline-secondary w-100 mb-2">
+                            <a href="{% url 'services:service_list' %}" class="btn btn-outline-secondary w-100 mb-2">
                                 <i class="fas fa-procedures me-1"></i> Services
                             </a>
                         </div>
+                        {% endif %}
+
+                        {% if user|has_role:"ADMIN,DIR,RES" %}
                         <div class="col-6">
-                            <a href="#" class="btn btn-outline-danger w-100 mb-2">
+                            <a href="{% url 'rh:conge_list' %}" class="btn btn-outline-danger w-100 mb-2">
                                 <i class="fas fa-umbrella-beach me-1"></i> Congés
                             </a>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

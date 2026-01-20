@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Affectations Personnel-Service{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-users-cog"></i> Affectations Services</h1>
+                <a href="{% url 'rh:personnel_service_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Nouvelle Affectation
+                </a>
+            </div>
+
+            <!-- Filtres -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Service</label>
+                            <select name="service" class="form-select">
+                                <option value="">Tous les services</option>
+                                {% for s in services %}
+                                <option value="{{ s.id }}">{{ s.nom_service }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Personnel</label>
+                            <select name="personnel" class="form-select">
+                                <option value="">Tout le personnel</option>
+                                {% for p in personnel_list %}
+                                <option value="{{ p.id }}">{{ p.nom_complet }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-filter"></i> Filtrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Personnel</th>
+                                    <th>Service</th>
+                                    <th>Date d'affectation</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for affectation in affectations %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'personnel_detail' affectation.personnel.pk %}"
+                                            class="text-decoration-none">
+                                            {{ affectation.personnel.nom_complet }}
+                                        </a>
+                                        <br>
+                                        <small class="text-muted">{{ affectation.personnel.get_fonction_display }}</small>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'services:service_detail' affectation.service.pk %}"
+                                            class="text-decoration-none">
+                                            {{ affectation.service.nom_service }}
+                                        </a>
+                                    </td>
+                                    <td>{{ affectation.date_affectation|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'rh:personnel_service_delete' affectation.pk %}"
+                                            class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">Aucune affectation trouvée</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if affectations.has_other_pages %}
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if affectations.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ affectations.previous_page_number }}">Précédent</a>
+                            </li>
+                            {% endif %}
+                            {% for num in affectations.paginator.page_range %}
+                            {% if affectations.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
+                            {% endfor %}
+                            {% if affectations.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ affectations.next_page_number }}">Suivant</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

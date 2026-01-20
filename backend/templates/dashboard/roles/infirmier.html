@@ -1,30 +1,52 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Espace Infirmier</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .header { background: #27ae60; color: white; padding: 20px; border-radius: 5px; }
-        .content { background: #f9f9f9; padding: 20px; margin-top: 20px; border-radius: 5px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>👨‍⚕️ Espace Infirmier</h1>
-            <p>Bonjour {{ user.username }}</p>
-        </div>
-        <div class="content">
-            <h2>Fonctionnalités Infirmier :</h2>
-            <ul>
-                <li>💉 Soins aux patients</li>
-                <li>📊 Surveillance des constantes</li>
-                <li>💊 Administration des médicaments</li>
-                <li>📝 Suivi des traitements</li>
-            </ul>
-            <a href="{% url 'dashboard' %}">← Retour au tableau de bord principal</a>
+{% extends 'base.html' %}
+
+{% block title %}Espace Infirmier{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Dashboard Infirmier</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-user-nurse me-2 text-success"></i> Espace Infirmier
+        </h1>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">👨‍⚕️ Bonjour {{ user.last_name|default:user.username }}</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-3 text-muted">Vos fonctionnalités :</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <i class="fas fa-syringe text-danger me-2"></i> Soins aux patients
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-heartbeat text-info me-2"></i> Surveillance des constantes
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <i class="fas fa-pills text-warning me-2"></i> Administration des médicaments
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-clipboard-check text-success me-2"></i> Suivi des traitements
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}
