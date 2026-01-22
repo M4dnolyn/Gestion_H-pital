@@ -1,96 +1,95 @@
 {% extends 'base.html' %}
 
-{% block title %}Nouveau Rendez-vous{% endblock %}
+{% block title %}
+{% if rdv %}Modifier le Rendez-vous{% else %}Nouveau Rendez-vous{% endif %}
+{% endblock %}
 
 {% block breadcrumb %}
-    <li class="breadcrumb-item"><a href="{% url 'rendezvous_list' %}">Rendez-vous</a></li>
-    <li class="breadcrumb-item active">Nouveau</li>
+<li class="breadcrumb-item">
+    <a href="{% url 'rendezvous_list' %}">Rendez-vous</a>
+</li>
+<li class="breadcrumb-item active">
+    {% if rdv %}Modifier{% else %}Nouveau{% endif %}
+</li>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid">
-    <div class="card">
-        <div class="card-header bg-success text-white">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-success text-white py-3">
             <h5 class="mb-0">
-                <i class="fas fa-calendar-plus me-2"></i> Nouveau Rendez-vous
+                <i class="fas fa-calendar-alt me-2"></i>
+                {% if rdv %}Modifier le Rendez-vous{% else %}Nouveau Rendez-vous{% endif %}
             </h5>
         </div>
-        <div class="card-body">
-            <form method="post">
+        <div class="card-body p-4">
+            <form method="post" class="needs-validation" novalidate>
                 {% csrf_token %}
-                
+
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">Patient *</label>
-                            <select name="patient" class="form-select" required>
-                                <option value="">Sélectionnez un patient...</option>
-                                {% for patient in patients %}
-                                <option value="{{ patient.id }}">{{ patient.nom }} {{ patient.prenom }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">{{ form.patient.label }}</label>
+                        {{ form.patient }}
+                        {% if form.patient.errors %}
+                        <div class="text-danger small mt-1">{{ form.patient.errors.0 }}</div>
+                        {% endif %}
                     </div>
-                    
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">Date *</label>
-                            <input type="date" name="date" class="form-control" required>
-                        </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">{{ form.medecin.label }}</label>
+                        {{ form.medecin }}
+                        {% if form.medecin.errors %}
+                        <div class="text-danger small mt-1">{{ form.medecin.errors.0 }}</div>
+                        {% endif %}
                     </div>
                 </div>
-                
+
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">Heure de début *</label>
-                            <input type="time" name="heure_debut" class="form-control" required>
-                        </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">{{ form.date_rdv.label }}</label>
+                        {{ form.date_rdv }}
+                        {% if form.date_rdv.errors %}
+                        <div class="text-danger small mt-1">{{ form.date_rdv.errors.0 }}</div>
+                        {% endif %}
                     </div>
-                    
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">Heure de fin *</label>
-                            <input type="time" name="heure_fin" class="form-control" required>
-                        </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">{{ form.heure_rdv.label }}</label>
+                        {{ form.heure_rdv }}
+                        {% if form.heure_rdv.errors %}
+                        <div class="text-danger small mt-1">{{ form.heure_rdv.errors.0 }}</div>
+                        {% endif %}
                     </div>
                 </div>
-                
-                <div class="mb-3">
-                    <label class="form-label">Type</label>
-                    <select name="type" class="form-select">
-                        <option value="consultation">Consultation</option>
-                        <option value="suivi">Suivi</option>
-                        <option value="urgence">Urgence</option>
-                    </select>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">{{ form.motif.label }}</label>
+                    {{ form.motif }}
+                    {% if form.motif.errors %}
+                    <div class="text-danger small mt-1">{{ form.motif.errors.0 }}</div>
+                    {% endif %}
                 </div>
-                
-                <div class="d-flex justify-content-between">
-                    <a href="{% url 'rendezvous_list' %}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left me-1"></i> Annuler
+
+                {% if form.statut_rdv %}
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">{{ form.statut_rdv.label }}</label>
+                    {{ form.statut_rdv }}
+                    {% if form.statut_rdv.errors %}
+                    <div class="text-danger small mt-1">{{ form.statut_rdv.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% if rdv %}{% url 'rendezvous_detail' rdv.pk %}{% else %}{% url 'rendezvous_list' %}{% endif %}"
+                        class="btn btn-outline-secondary px-4">
+                        <i class="fas fa-times me-1"></i> Annuler
                     </a>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-calendar-check me-1"></i> Programmer
+                    <button type="submit" class="btn btn-success px-5">
+                        <i class="fas fa-calendar-check me-1"></i>
+                        {% if rdv %}Enregistrer{% else %}Programmer{% endif %}
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-<script>
-    // Pré-remplir avec la date d'aujourd'hui
-    document.addEventListener('DOMContentLoaded', function() {
-        const today = new Date().toISOString().split('T')[0];
-        document.querySelector('input[name="date"]').value = today;
-        
-        // Heure par défaut : maintenant + 1 heure
-        const now = new Date();
-        const startHour = now.getHours().toString().padStart(2, '0') + ':00';
-        const endHour = (now.getHours() + 1).toString().padStart(2, '0') + ':00';
-        
-        document.querySelector('input[name="heure_debut"]').value = startHour;
-        document.querySelector('input[name="heure_fin"]').value = endHour;
-    });
-</script>
 {% endblock %}

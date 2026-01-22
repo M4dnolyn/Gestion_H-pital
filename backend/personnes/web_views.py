@@ -4,6 +4,9 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
 from datetime import date
+import logging
+
+logger = logging.getLogger(__name__)
 
 from .models import Patient, Personnel, ProcheAidant
 from .forms import PatientForm, PersonnelForm, ProcheAidantForm
@@ -65,22 +68,17 @@ def patient_detail(request, pk):
 def patient_create(request):
     """Créer un patient"""
     if request.method == 'POST':
-        # Essayer d'abord avec le formulaire complet
         form = PatientForm(request.POST)
         if form.is_valid():
-            patient = form.save()
-            messages.success(request, 'Patient créé avec succès!')
-            return redirect('patient_list')
-        elif 'nom' in request.POST and 'prenom' in request.POST:
-            # Fallback manuel si le form échoue ou n'est pas utilisé
-            Patient.objects.create(
-                nom=request.POST.get('nom'),
-                prenom=request.POST.get('prenom'),
-                telephone=request.POST.get('telephone'),
-                email=request.POST.get('email')
-            )
-            messages.success(request, 'Patient créé avec succès!')
-            return redirect('patient_list')
+            try:
+                patient = form.save()
+                messages.success(request, 'Patient créé avec succès!')
+                return redirect('patient_list')
+            except Exception as e:
+                logger.exception("Erreur lors de la sauvegarde du patient:")
+                messages.error(request, f"Erreur technique lors de la création : {str(e)}")
+        else:
+            messages.error(request, 'Erreur lors de la création du patient. Veuillez vérifier les champs.')
     else:
         form = PatientForm()
     

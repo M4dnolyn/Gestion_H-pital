@@ -59,31 +59,25 @@ def rendezvous_detail(request, pk):
 def rendezvous_create(request):
     """Créer un rendez-vous"""
     if request.method == 'POST':
-        try:
-            # Gestion basique si le formulaire standard n'est pas utilisé
-            # Idéalement on devrait utiliser RendezVousForm ici aussi comme pour update
-            if 'patient' in request.POST:
-                patient = Patient.objects.get(id=request.POST.get('patient'))
-                medecin = None
-                if request.POST.get('medecin'):
-                    medecin = Personnel.objects.get(id=request.POST.get('medecin'))
-                
-                RendezVous.objects.create(
-                    patient=patient,
-                    medecin=medecin,
-                    date_rdv=request.POST.get('date_rdv'),
-                    heure_rdv=request.POST.get('heure_rdv'),
-                    motif=request.POST.get('motif', ''),
-                    statut_rdv='Programmé'
-                )
+        form = RendezVousForm(request.POST)
+        if form.is_valid():
+            try:
+                form.save()
                 messages.success(request, 'Rendez-vous programmé avec succès!')
                 return redirect('rendezvous_list')
-        except Patient.DoesNotExist:
-            messages.error(request, 'Patient non trouvé')
+            except Exception as e:
+                messages.error(request, f"Erreur technique lors de la programmation : {str(e)}")
+        else:
+            messages.error(request, 'Erreur lors de la programmation. Veuillez vérifier les informations saisies.')
+    else:
+        # Pré-remplissage possible via GET (ex: depuis détail patient)
+        initial_data = {}
+        patient_id = request.GET.get('patient')
+        if patient_id:
+            initial_data['patient'] = patient_id
+        form = RendezVousForm(initial=initial_data)
     
-    patients = Patient.objects.all()
-    medecins = Personnel.objects.filter(fonction='MED')
-    return render(request, 'rendezvous/form.html', {'patients': patients, 'medecins': medecins})
+    return render(request, 'rendezvous/form.html', {'form': form})
 
 
 @login_required

@@ -139,7 +139,7 @@
                                     <td>{{ ligne.prestation.libelle_acte }}</td>
                                     <td class="text-center">{{ ligne.qte }}</td>
                                     <td class="text-end">{{ ligne.prix_unit }} FCFA</td>
-                                    <td class="text-end"><strong>{{ ligne.qte|mul:ligne.prix_unit }} FCFA</strong></td>
+                                    <td class="text-end"><strong>{{ ligne.total_ligne }} FCFA</strong></td>
                                     {% if facture.statut_paiement != 'Payée' %}
                                     <td class="text-center">
                                         <form method="post"

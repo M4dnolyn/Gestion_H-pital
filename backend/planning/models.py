@@ -10,10 +10,21 @@ class RendezVous(models.Model):
         limit_choices_to={'fonction': 'MED'},
         related_name='rendezvous'
     )
+    STATUT_CHOICES = [
+        ('Programmé', 'Programmé'),
+        ('Confirmé', 'Confirmé'),
+        ('Annulé', 'Annulé'),
+        ('Terminé', 'Terminé'),
+    ]
+    
     date_rdv = models.DateField()
     heure_rdv = models.TimeField()
     motif = models.TextField()
-    statut_rdv = models.CharField(max_length=20, default='Programmé')
+    statut_rdv = models.CharField(
+        max_length=20,
+        choices=STATUT_CHOICES,
+        default='Programmé'
+    )
     
     def __str__(self):
         return f"RDV {self.date_rdv} - {self.patient}"

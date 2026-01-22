@@ -7,11 +7,11 @@ router = DefaultRouter()
 router.register(r'api', RendezVousViewSet, basename='api_rendezvous')
 
 urlpatterns = [
-    # API via Router
-    path('', include(router.urls)),
-    
     # Web Views
     path('', web_views.rendezvous_list, name='rendezvous_list'),
+    
+    # API via Router (Placé après pour ne pas intercepter la racine)
+    path('', include(router.urls)),
     path('nouveau/', web_views.rendezvous_create, name='rendezvous_create'),
     path('<int:pk>/', web_views.rendezvous_detail, name='rendezvous_detail'),
     path('<int:pk>/modifier/', web_views.rendezvous_update, name='rendezvous_update'),

@@ -3,53 +3,116 @@
 {% block title %}Nouveau Patient{% endblock %}
 
 {% block breadcrumb %}
-    <li class="breadcrumb-item"><a href="{% url 'patient_list' %}">Patients</a></li>
-    <li class="breadcrumb-item active">Nouveau</li>
+<li class="breadcrumb-item">
+    <a href="{% url 'patient_list' %}">Patients</a>
+</li>
+<li class="breadcrumb-item active">Nouveau</li>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid">
-    <div class="card">
-        <div class="card-header bg-primary text-white">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white py-3">
             <h5 class="mb-0">
                 <i class="fas fa-user-plus me-2"></i> Nouveau Patient
             </h5>
         </div>
-        <div class="card-body">
-            <form method="post">
+        <div class="card-body p-4">
+            <form method="post" class="needs-validation" novalidate>
                 {% csrf_token %}
-                
+
+                <!-- Nom et Prénom -->
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">Nom *</label>
-                            <input type="text" name="nom" class="form-control" required>
-                        </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">{{ form.nom.label }}</label>
+                        {{ form.nom }}
+                        {% if form.nom.errors %}
+                        <div class="text-danger small mt-1">{{ form.nom.errors.0 }}</div>
+                        {% endif %}
                     </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">Prénom *</label>
-                            <input type="text" name="prenom" class="form-control" required>
-                        </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">{{ form.prenom.label }}</label>
+                        {{ form.prenom }}
+                        {% if form.prenom.errors %}
+                        <div class="text-danger small mt-1">{{ form.prenom.errors.0 }}</div>
+                        {% endif %}
                     </div>
                 </div>
-                
-                <div class="mb-3">
-                    <label class="form-label">Téléphone</label>
-                    <input type="tel" name="telephone" class="form-control">
+
+                <!-- Date Naissance et Sexe -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">{{ form.date_naissance.label }}</label>
+                        {{ form.date_naissance }}
+                        {% if form.date_naissance.errors %}
+                        <div class="text-danger small mt-1">{{ form.date_naissance.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">{{ form.sexe.label }}</label>
+                        {{ form.sexe }}
+                        {% if form.sexe.errors %}
+                        <div class="text-danger small mt-1">{{ form.sexe.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                 </div>
-                
-                <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control">
+
+                <!-- Téléphone et Email -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">{{ form.telephone.label }}</label>
+                        {{ form.telephone }}
+                        {% if form.telephone.errors %}
+                        <div class="text-danger small mt-1">{{ form.telephone.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">{{ form.email.label }}</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                 </div>
-                
-                <div class="d-flex justify-content-between">
-                    <a href="{% url 'patient_list' %}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left me-1"></i> Annuler
+
+                <!-- Adresse -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">{{ form.adresse.label }}</label>
+                    {{ form.adresse }}
+                    {% if form.adresse.errors %}
+                    <div class="text-danger small mt-1">{{ form.adresse.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <hr class="my-4">
+                <h6 class="mb-3 text-primary">
+                    <i class="fas fa-notes-medical me-2"></i>Informations Médicales (Optionnel)
+                </h6>
+
+                <!-- Médical -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">{{ form.groupe_sanguin.label }}</label>
+                        {{ form.groupe_sanguin }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">{{ form.assurance.label }}</label>
+                        {{ form.assurance }}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">{{ form.antecedent.label }}</label>
+                    {{ form.antecedent }}
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'patient_list' %}" class="btn btn-outline-secondary px-4">
+                        <i class="fas fa-times me-1"></i> Annuler
                     </a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Enregistrer
+                    <button type="submit" class="btn btn-primary px-5">
+                        <i class="fas fa-save me-1"></i> Enregistrer le Patient
                     </button>
                 </div>
             </form>

@@ -15,4 +15,15 @@ def has_role(user, roles_string):
         return False
         
     roles = [role.strip() for role in roles_string.split(',')]
-    return user.personnel_profile.fonction in roles
+    personnel = getattr(user, 'personnel_profile', None)
+    if not personnel:
+        return False
+    return personnel.fonction in roles
+
+@register.filter(name='mul')
+def mul(value, arg):
+    """Multiplie la valeur par l'argument"""
+    try:
+        return value * arg
+    except (ValueError, TypeError):
+        return 0

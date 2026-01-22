@@ -27,6 +27,11 @@ class Facture(models.Model):
     def __str__(self):
         return f"Facture {self.id}"
 
+    @property
+    def get_total(self):
+        """Calcule le total de la facture"""
+        return sum(ligne.qte * ligne.prix_unit for ligne in self.lignes.all())
+
 
 class FacturePrestation(models.Model):
     facture = models.ForeignKey(
@@ -40,6 +45,11 @@ class FacturePrestation(models.Model):
     )
     qte = models.PositiveIntegerField()
     prix_unit = models.DecimalField(max_digits=10, decimal_places=2)
+
+    @property
+    def total_ligne(self):
+        """Calcule le total de la ligne"""
+        return self.qte * self.prix_unit
 
     def __str__(self):
         return f"{self.prestation} x {self.qte}"

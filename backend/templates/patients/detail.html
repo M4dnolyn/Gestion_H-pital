@@ -3,8 +3,8 @@
 {% block title %}Détail Patient - {{ patient.nom }}{% endblock %}
 
 {% block breadcrumb %}
-    <li class="breadcrumb-item"><a href="{% url 'patient_list' %}">Patients</a></li>
-    <li class="breadcrumb-item active">{{ patient.nom }}</li>
+<li class="breadcrumb-item"><a href="{% url 'patient_list' %}">Patients</a></li>
+<li class="breadcrumb-item active">{{ patient.nom }}</li>
 {% endblock %}
 
 {% block content %}
@@ -27,13 +27,25 @@
                 <div class="card-body">
                     <p><strong>Nom :</strong> {{ patient.nom }}</p>
                     <p><strong>Prénom :</strong> {{ patient.prenom }}</p>
+                    <p><strong>Sexe :</strong> {{ patient.get_sexe_display }}</p>
+                    <p><strong>Date de naissance :</strong> {{ patient.date_naissance|date:"d/m/Y" }}</p>
                     <p><strong>Téléphone :</strong> {{ patient.telephone|default:"Non renseigné" }}</p>
                     <p><strong>Email :</strong> {{ patient.email|default:"Non renseigné" }}</p>
-                    <p><strong>Date de création :</strong> {{ patient.date_creation|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Adresse :</strong> {{ patient.adresse }}</p>
+
+                    <hr>
+                    <h6 class="text-muted mb-3">Informations Médicales</h6>
+                    <p><strong>Groupe Sanguin :</strong> <span class="badge bg-danger">{{
+                            patient.groupe_sanguin|default:"Non renseigné" }}</span></p>
+                    <p><strong>Assurance :</strong> {{ patient.assurance|default:"Aucune" }}</p>
+                    <p><strong>Antécédents :</strong></p>
+                    <div class="bg-light p-2 rounded">
+                        {{ patient.antecedent|linebreaks|default:"Aucun antécédent enregistré" }}
+                    </div>
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
