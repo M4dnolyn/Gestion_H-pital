@@ -15,7 +15,7 @@
                     <p class="lead">Êtes-vous sûr de vouloir retirer cette prestation de la facture ?</p>
                     <div class="alert alert-secondary">
                         <h5>{{ ligne.prestation.libelle_acte }}</h5>
-                        <p>Quantité: {{ ligne.qte }} | Total: {{ ligne.qte|mul:ligne.prix_unit }} FCFA</p>
+                        <p>Quantité: {{ ligne.qte }} | Total: {{ ligne.total_ligne }} FCFA</p>
                     </div>
 
                     <form method="post">
